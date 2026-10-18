@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.maxtunnel.app.view.RoundCornerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    app:bottomLeftEnabled="false"
+    app:bottomRightEnabled="false"
+    app:cornerRadius="20dp"
+    app:topLeftEnabled="false"
+    app:topRightEnabled="true">
+    <LinearLayout
+        android:gravity="bottom|center|start"
+        android:orientation="horizontal"
+        android:id="@+id/card0"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp">
+            <LinearLayout
+                android:gravity="center|start"
+                android:orientation="horizontal"
+                android:id="@+id/sidebar_LinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/sidebar_icon"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/app_main_logo"
+                    android:layout_marginStart="5dp" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:id="@+id/sidebar_name_linearlayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/dataOut"
+                            android:id="@+id/sidebar_app_name_before"
+                            android:paddingLeft="1dp"
+                            android:paddingRight="1dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_name_before"
+                            android:singleLine="true"
+                            android:fontFamily="serif" />
+                        <TextView
+                            android:textSize="20sp"
+                            android:typeface="serif"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"
+                            android:gravity="start"
+                            android:id="@+id/sidebar_app_name_after"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_name_after"
+                            android:singleLine="true"
+                            android:layout_weight="1.0"
+                            android:fontFamily="serif" />
+                    </LinearLayout>
+                    <View
+                        android:id="@+id/sidebar_name_line"
+                        android:background="@color/black_light"
+                        android:layout_width="180dp"
+                        android:layout_height="2dp"
+                        android:layout_below="@+id/sidebar_name_linearlayout" />
+                    <TextView
+                        android:textSize="10sp"
+                        android:textColor="@color/white"
+                        android:gravity="start"
+                        android:id="@+id/sidebar_app_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Virtual private network"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
+                        android:layout_below="@+id/sidebar_name_line"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:fontFamily="sans-serif-smallcaps"
+                        android:layout_marginStart="2dp" />
+                </RelativeLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</com.maxtunnel.app.view.RoundCornerLayout>

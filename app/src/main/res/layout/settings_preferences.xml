@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr">
+    
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp">
+        <androidx.appcompat.widget.Toolbar
+            android:theme="@style/ToolbarTheme"
+            android:id="@+id/toolbar_main"
+            android:background="@color/colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:minHeight="?attr/actionBarSize"
+            app:subtitleTextAppearance="@style/ToolbarSubtitleTheme"
+            app:titleTextAppearance="@style/ToolbarTitleTheme" />
+    </com.google.android.material.appbar.AppBarLayout>
+    
+    <androidx.core.widget.NestedScrollView
+        android:paddingBottom="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/advancesettingsLinearLayout"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set1"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/ed_ly0"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+                            <EditText
+                                android:id="@+id/con_time_ed"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="5"
+                                android:hint="Reconnecting Thread (seconds)"
+                                android:inputType="number" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <CheckBox
+                            android:id="@+id/check1"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </RelativeLayout>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:id="@+id/set2"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Data compression" />
+                        <TextView
+                            android:textSize="10sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tunnel compression options" />
+                    </LinearLayout>
+                    <CheckBox
+                        android:id="@+id/check2"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set3"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/title_tethering_subnet" />
+                        <TextView
+                            android:textSize="10sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/summary_tethering_subnet" />
+                    </LinearLayout>
+                    <CheckBox
+                        android:gravity="center"
+                        android:id="@+id/check3"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set4"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pause_vpn_on_blanked_screen_title" />
+                        <TextView
+                            android:textSize="10sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pause_vpn_on_blanked_screen_summary" />
+                    </LinearLayout>
+                    <CheckBox
+                        android:gravity="center"
+                        android:id="@+id/check4"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set5"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/title_auto_clear_log" />
+                    </LinearLayout>
+                    <CheckBox
+                        android:gravity="center"
+                        android:id="@+id/check5"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set6"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/title_disable_delay_ssh" />
+                        <TextView
+                            android:textSize="10sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/summary_disable_delay_ssh" />
+                    </LinearLayout>
+                    <CheckBox
+                        android:gravity="center"
+                        android:id="@+id/check6"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/mBufferSize"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
+                    <LinearLayout
+                        android:gravity="center|left"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Buffer Size" />
+                        <LinearLayout
+                            android:gravity="center|left"
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                android:textSize="12sp"
+                                android:id="@+id/bufSend"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Send: 16384" />
+                            <View
+                                android:background="@color/grey_500"
+                                android:layout_width="2dp"
+                                android:layout_height="5dp"
+                                android:layout_margin="10dp" />
+                            <TextView
+                                android:textSize="12sp"
+                                android:id="@+id/bufReceive"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Receive: 32768" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:id="@+id/set7"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/title_number_max_threads" />
+                        <TextView
+                            android:textSize="10sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/summary_number_max_threads" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/mx_thread_lay"
+                        android:background="@drawable/setting_bg"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <RadioGroup
+                            android:orientation="vertical"
+                            android:id="@+id/rGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <RadioButton
+                                android:textSize="12sp"
+                                android:id="@+id/rbt1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="2 (minimum)" />
+                            <RadioButton
+                                android:textSize="12sp"
+                                android:id="@+id/rbt2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="8 (pattern)" />
+                            <RadioButton
+                                android:textSize="12sp"
+                                android:id="@+id/rbt3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="15 (medium)" />
+                            <RadioButton
+                                android:textSize="12sp"
+                                android:id="@+id/rbt4"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="25 (maximum)" />
+                        </RadioGroup>
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <View
+                    android:background="?android:attr/dividerVertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="15dp" />
+                
+                <TextView
+                    android:textSize="12sp"
+                    android:textColor="@color/colorPrimary"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Additional setting" />
+                    
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:id="@+id/set8"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Night mode" />
+                        <TextView
+                            android:textSize="10sp"
+                            android:id="@+id/isNight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Deactivate" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:id="@+id/Theme_check_lay"
+                        android:background="@drawable/setting_bg"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <CheckBox
+                                android:textSize="12sp"
+                                android:id="@+id/theme0"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Automatic" />
+                        </LinearLayout>
+                        <View
+                            android:background="?android:attr/dividerVertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp" />
+                        <CheckBox
+                            android:textSize="12sp"
+                            android:id="@+id/theme1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active" />
+                        <View
+                            android:background="?android:attr/dividerVertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp" />
+                        <CheckBox
+                            android:textSize="12sp"
+                            android:id="@+id/theme2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Deactivate" />
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set9"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="SSH Payload Generator" />
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set10"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="IP Hunter" />
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:id="@+id/set11"
+                    android:background="@drawable/setting_bg"
+                    android:padding="5dp"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:onClick="onClick">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.0">
+                        <TextView
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Host Checker" />
+                    </LinearLayout>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:textSize="15sp"
+                        android:id="@+id/advancesettingsTextView1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Advance settings" />
+                    
+                    <include layout="@layout/more_set" />
+                </LinearLayout>
+                
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

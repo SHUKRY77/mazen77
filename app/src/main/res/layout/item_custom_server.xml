@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_card"
+    android:layout_width="match_parent"
+    android:layout_height="48dp" 
+    android:layout_marginBottom="6dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="3dp" 
+    app:strokeWidth="1.2dp"
+    app:strokeColor="#E0E0E0"
+    app:cardBackgroundColor="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="8dp" 
+        android:clipChildren="true"
+        android:clipToPadding="true">
+
+        <!-- الأيقونة اليسرى (تم تصغيرها) -->
+        <TextView
+            android:id="@+id/drag_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="≡"
+            android:textColor="#B0BEC5"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- اللوجو (تم تصغيره) -->
+        <ImageView
+            android:id="@+id/item_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_toEndOf="@id/drag_handle"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="6dp"
+            android:scaleType="centerCrop"/>
+
+        <!-- النصوص (تم تصغيرها) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/item_icon"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="38dp">
+
+            <TextView
+                android:id="@+id/item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Server Title"
+                android:textColor="#333333"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/item_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="info subtitle"
+                android:textColor="#2196F3"
+                android:textSize="8.5sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginTop="0dp" />
+        </LinearLayout>
+
+        <!-- الشريط المائل (تم تعديل هندسته لتناسب 48dp) -->
+        <RelativeLayout
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="-21dp"
+            android:layout_marginEnd="-21dp"
+            android:rotation="45">
+
+            <TextView
+                android:id="@+id/item_badge"
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:layout_alignParentBottom="true"
+                android:background="#2196F3"
+                android:gravity="center"
+                android:text="V2Ray"
+                android:textColor="@color/white"
+                android:textSize="6sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Max Tunnel</string>
+    <string name="app_copyright">All Rights Reserved</string>
+    
+    <string name="app_name_before">MAX-</string>
+    <string name="app_name_after">vip</string>
+    
+    <string name="title_tethering_subnet">Tethering Subnet</string>
+    <string name="summary_tethering_subnet">Set subnet for hotspot sharing</string>
+    <string name="pause_vpn_on_blanked_screen_title">Pause VPN on blanked screen</string>
+    <string name="pause_vpn_on_blanked_screen_summary">Disable connection when screen is off</string>
+    <string name="title_auto_clear_log">Auto clear log</string>
+    <string name="title_disable_delay_ssh">Disable delay SSH</string>
+    <string name="summary_disable_delay_ssh">Disable SSH connection delay</string>
+    <string name="title_number_max_threads">Max threads</string>
+    <string name="summary_number_max_threads">Number of maximum connection threads</string>
+
+    <!-- النصوص التي تمت إضافتها لحل مشكلة البناء (cert_warn.xml) -->
+    <string name="cert_error_header_text">Certificate Error</string>
+    <string name="issued_to">Issued to:</string>
+    <string name="common_name">Common Name (CN):</string>
+    <string name="org_name">Organization (O):</string>
+    <string name="org_unit">Organizational Unit (OU):</string>
+    <string name="serial_number">Serial Number:</string>
+    <string name="issued_by">Issued by:</string>
+    <string name="validity_period">Validity Period:</string>
+    <string name="issued_on">Issued on:</string>
+    <string name="expires_on">Expires on:</string>
+    <string name="fingerprints">Fingerprints:</string>
+    <string name="sha256_fingerprint">SHA-256:</string>
+    <string name="sha1_fingerprint">SHA-1:</string>
+</resources>

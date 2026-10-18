@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="pref_preference_screen">
+
+    <CheckBoxPreference
+        android:title="Pause VPN on blanked screen"
+        android:key="pause_vpn_on_blanked_screen"
+        android:summary="Pause VPN when screen is blanked"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:gravity="left"
+        android:title="Enable Sniffing"
+        android:key="pref_sniffing_enabled"
+        android:summary="Try sniff domain from the packet (default on)"
+        android:defaultValue="true" />
+
+    <PreferenceCategory android:title="VPN Settings">
+        <CheckBoxPreference
+            android:title="Enable local DNS"
+            android:key="pref_local_dns_enabled"
+            android:summary="DNS processed by core's DNS module" />
+        <CheckBoxPreference
+            android:title="Enable fake DNS"
+            android:key="pref_fake_dns_enabled"
+            android:summary="local DNS returns fake IP address" />
+        <EditTextPreference
+            android:title="Local DNS port"
+            android:key="pref_local_dns_port"
+            android:summary="10853"
+            android:inputType="number" />
+        <EditTextPreference
+            android:title="VPN DNS (only IPv4/v6)"
+            android:key="pref_vpn_dns"
+            android:summary="DNS" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Routing">
+        <ListPreference
+            android:entries="@array/routing_domain_strategy"
+            android:title="Domain strategy"
+            android:key="pref_routing_domain_strategy"
+            android:summary="%s"
+            android:defaultValue="IPIfNonMatch"
+            android:entryValues="@array/routing_domain_strategy" />
+        <ListPreference
+            android:entries="@array/routing_mode"
+            android:title="Predefined rules"
+            android:key="pref_routing_mode"
+            android:summary="%s"
+            android:defaultValue="0"
+            android:entryValues="@array/routing_mode_value" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Mux Settings">
+        <CheckBoxPreference
+            android:title="Enable Mux"
+            android:key="pref_mux_enabled"
+            android:summary="Enable maybe speed up network and switch network maybe flash" />
+        <EditTextPreference
+            android:title="TCP connections (range -1 to 1024)"
+            android:key="pref_mux_concurrency"
+            android:summary="8"
+            android:inputType="number" />
+        <EditTextPreference
+            android:title="XUDP connections (range -1 to 1024)"
+            android:key="pref_mux_xudp_concurrency"
+            android:summary="8"
+            android:inputType="number" />
+        <ListPreference
+            android:entries="@array/mux_xudp_quic_entries"
+            android:title="Handling of QUIC in mux tunnel"
+            android:key="pref_mux_xudp_quic"
+            android:summary="%s"
+            android:defaultValue="reject"
+            android:entryValues="@array/mux_xudp_quic_value" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Advanced Settings">
+        <CheckBoxPreference
+            android:title="Prefer IPv6"
+            android:key="pref_prefer_ipv6"
+            android:summary="Prefer IPv6 address and routes" />
+        <CheckBoxPreference
+            android:title="Allow connections from the LAN"
+            android:key="pref_proxy_sharing_enabled"
+            android:summary="Other devices can connect to proxy by your ip address through socks/http"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:title="allowInsecure"
+            android:key="pref_allow_insecure"
+            android:summary="When TLS, the default allowInsecure"
+            android:defaultValue="true" />
+        <EditTextPreference
+            android:title="SOCKS5 proxy port"
+            android:key="pref_socks_port"
+            android:summary="10808"
+            android:inputType="number" />
+        <EditTextPreference
+            android:title="HTTP proxy port"
+            android:key="pref_http_port"
+            android:summary="10809"
+            android:inputType="number" />
+        <EditTextPreference
+            android:title="Remote DNS (Optional)"
+            android:key="pref_remote_dns"
+            android:summary="DNS" />
+        <EditTextPreference
+            android:title="Domestic DNS (Optional)"
+            android:key="pref_domestic_dns"
+            android:summary="DNS" />
+        <ListPreference
+            android:entries="@array/core_loglevel"
+            android:title="Log Level"
+            android:key="pref_core_loglevel"
+            android:summary="%s"
+            android:defaultValue="warning"
+            android:entryValues="@array/core_loglevel" />
+        <ListPreference
+            android:entries="@array/mode_entries"
+            android:title="Mode"
+            android:key="pref_mode"
+            android:summary="%s"
+            android:defaultValue="VPN"
+            android:entryValues="@array/mode_value" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

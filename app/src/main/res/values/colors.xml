@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="black_light">#444444</color>
+    <color name="button_iv_color_dark">#212121</color>
+    <color name="button_iv_color_light">#f8f8f8</color>
+    <color name="button_material_dark">#5a595b</color>
+    <color name="button_material_light">#d6d7d7</color>
+    <color name="call_notification_answer_color">#1d873b</color>
+    <color name="call_notification_decline_color">#d93025</color>
+    <color name="cardview_dark_background">#424242</color>
+    <color name="cardview_light_background">#ffffff</color>
+    
+    <color name="colorAccent">#c51c18</color>
+    <color name="colorPrimary">#c51c18</color>
+    <color name="colorPrimaryDark">#c51c18</color>
+    
+    <color name="connected_color">#01cf57</color>
+    <color name="connecting_color">#ffc107</color>
+    <color name="disconnected_color">#d51212</color>
+    <color name="dataIn">#00ff6a</color>
+    <color name="dataOut">#d51212</color>
+    
+    <color name="dark_mode_frame">#ee222121</color>
+    <color name="fix_hint_both">#616161</color>
+    <color name="fix_hint_light">#cbcbcb</color>
+    <color name="fix_info_text">#252525</color>
+    <color name="fix_transparent_soft">#4f7a7a7a</color>
+    <color name="flag_iv_color_dark">#212121</color>
+    <color name="flag_iv_color_light">#efefef</color>
+    <color name="grey_500">#818181</color>
+    <color name="grey_800">#252525</color>
+    <color name="prog_dark">#333333</color>
+    <color name="prog_light">#e8e8e8</color>
+    <color name="transparent">#00000000</color>
+    <color name="transparent2">#9c7a7a7a</color>
+    <color name="waiting_color">#2196f3</color>
+    <color name="white">#ffffff</color>
+    <color name="white_light">#f5f5f5</color>
+    <color name="windowBackground_dark">#171717</color>
+    <color name="windowBackground_light">#ffffff</color>
+    <color name="window_nav_light">#e8e8e8</color>
+
+    <attr name="minValue" format="float" />
+    <attr name="maxValue" format="float" />
+    <attr name="scaleMode" format="enum">
+        <enum name="fixed" value="0" />
+        <enum name="auto" value="1" />
+    </attr>
+
+    <attr name="loading_color" format="color" />
+    <attr name="loading_visible" format="boolean" />
+    <attr name="loading_width" format="dimension" />
+
+    <attr name="progressBarThickness" format="dimension" />
+    <attr name="progress" format="integer|float" />
+
+    <attr name="topLeftEnabled" format="boolean" />
+    <attr name="topRightEnabled" format="boolean" />
+    <attr name="bottomLeftEnabled" format="boolean" />
+    <attr name="bottomRightEnabled" format="boolean" />
+    <attr name="cornerRadius" format="dimension" />
+
+    <declare-styleable name="RoundCornerLayout">
+        <attr name="minValue" />
+        <attr name="maxValue" />
+        <attr name="scaleMode" />
+        <attr name="loading_color" />
+        <attr name="loading_visible" />
+        <attr name="loading_width" />
+        <attr name="progressBarThickness" />
+        <attr name="progress" />
+        <attr name="topLeftEnabled" />
+        <attr name="topRightEnabled" />
+        <attr name="bottomLeftEnabled" />
+        <attr name="bottomRightEnabled" />
+        <attr name="cornerRadius" />
+    </declare-styleable>
+
+</resources>

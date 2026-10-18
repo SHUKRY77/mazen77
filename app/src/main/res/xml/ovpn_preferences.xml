@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="pref_preference_screen">
+
+    <CheckBoxPreference
+        android:title="Pause VPN on blanked screen"
+        android:key="pause_vpn_on_blanked_screen"
+        android:summary="Pause the VPN connection when the screen is turned off"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:title="Seamless Tunnel"
+        android:key="tun_persist"
+        android:summary="Block internet while VPN is paused or reconnecting"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:title="Reconnect on reboot"
+        android:key="autostart"
+        android:summary="Start VPN automatically on device boot"
+        android:defaultValue="false" />
+
+    <EditTextPreference
+        android:title="Proxy address"
+        android:key="pref_vpn_proxy_address"
+        android:summary="Proxy (Host:port)"
+        android:defaultValue="127.0.0.1:8989" />
+
+    <ListPreference
+        android:entries="@array/vpn_proto_array"
+        android:title="VPN Protocol"
+        android:key="vpn_proto"
+        android:summary="Select the VPN Protocol"
+        android:entryValues="@array/vpn_proto_values" />
+
+    <ListPreference
+        android:entries="@array/ipv6_array"
+        android:title="IPv6 Support"
+        android:key="ipv6"
+        android:summary="IPv6 tunnel preference"
+        android:entryValues="@array/ipv6_values" />
+
+    <ListPreference
+        android:entries="@array/conn_timeout_array"
+        android:title="Connection Timeout"
+        android:key="conn_timeout"
+        android:summary="How long should VPN try to connect before giving up?"
+        android:entryValues="@array/conn_timeout_values" />
+
+    <ListPreference
+        android:entries="@array/compression_array"
+        android:title="Compression"
+        android:key="compression_mode"
+        android:summary="Tunnel compression options"
+        android:entryValues="@array/compression_values" />
+
+    <CheckBoxPreference
+        android:title="Force AES-CBC ciphersuites"
+        android:key="force_aes_cbc_ciphersuites_v2"
+        android:summary="Enabling this option can sometimes help when connecting to legacy servers"
+        android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:title="Use insecure algorithms"
+        android:key="cert_profile_insecure"
+        android:summary="Enable support for MD5 signatures of X509 certificates"
+        android:defaultValue="true" />
+
+    <ListPreference
+        android:entries="@array/tls_version_min_override_array"
+        android:title="Minimum TLS version"
+        android:key="tls_version_min_override"
+        android:summary="Select the minimum SSL/TLS version for communication"
+        android:entryValues="@array/tls_version_min_override_values" />
+
+    <CheckBoxPreference
+        android:title="DNS Fallback"
+        android:key="google_dns_fallback"
+        android:summary="Use Google DNS servers as a fallback"
+        android:defaultValue="false" />
+
+</PreferenceScreen>

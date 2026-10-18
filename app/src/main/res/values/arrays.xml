@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="vpn_proto_array">
+        <item>UDP</item>
+        <item>TCP</item>
+    </string-array>
+    <string-array name="vpn_proto_values">
+        <item>udp</item>
+        <item>tcp</item>
+    </string-array>
+
+    <string-array name="ipv6_array">
+        <item>IPv4 Only</item>
+        <item>IPv6 Only</item>
+        <item>IPv4 and IPv6</item>
+    </string-array>
+    <string-array name="ipv6_values">
+        <item>ipv4</item>
+        <item>ipv6</item>
+        <item>both</item>
+    </string-array>
+
+    <string-array name="conn_timeout_array">
+        <item>10 seconds</item>
+        <item>30 seconds</item>
+        <item>60 seconds</item>
+        <item>120 seconds</item>
+    </string-array>
+    <string-array name="conn_timeout_values">
+        <item>10</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+    </string-array>
+
+    <string-array name="compression_array">
+        <item>None</item>
+        <item>LZO</item>
+        <item>LZ4</item>
+    </string-array>
+    <string-array name="compression_values">
+        <item>none</item>
+        <item>lzo</item>
+        <item>lz4</item>
+    </string-array>
+
+    <string-array name="tls_version_min_override_array">
+        <item>Default</item>
+        <item>TLS 1.1</item>
+        <item>TLS 1.2</item>
+        <item>TLS 1.3</item>
+    </string-array>
+    <string-array name="tls_version_min_override_values">
+        <item>default</item>
+        <item>tls-1.1</item>
+        <item>tls-1.2</item>
+        <item>tls-1.3</item>
+    </string-array>
+
+    <string-array name="routing_domain_strategy">
+        <item>IPIfNonMatch</item>
+        <item>IPOnDemand</item>
+        <item>AsIs</item>
+    </string-array>
+    
+    <string-array name="routing_mode">
+        <item>Global</item>
+        <item>Bypass LAN</item>
+        <item>Bypass Mainland China</item>
+    </string-array>
+    <string-array name="routing_mode_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="mux_xudp_quic_entries">
+        <item>Reject</item>
+        <item>Accept</item>
+    </string-array>
+    <string-array name="mux_xudp_quic_value">
+        <item>reject</item>
+        <item>accept</item>
+    </string-array>
+
+    <string-array name="core_loglevel">
+        <item>Debug</item>
+        <item>Info</item>
+        <item>Warning</item>
+        <item>Error</item>
+        <item>None</item>
+    </string-array>
+
+    <string-array name="mode_entries">
+        <item>VPN</item>
+        <item>Proxy Only</item>
+    </string-array>
+    <string-array name="mode_value">
+        <item>VPN</item>
+        <item>ProxyOnly</item>
+    </string-array>
+</resources>

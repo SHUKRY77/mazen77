@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent">
+
+    <LinearLayout
+        android:id="@+id/progress_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:gravity="center"
+        android:layoutDirection="ltr"
+        android:orientation="vertical"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="90dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <com.maxtunnel.app.RoundCornerLayout
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            app:bottomLeftEnabled="false"
+            app:bottomRightEnabled="false"
+            app:cornerRadius="20dp"
+            app:topLeftEnabled="true"
+            app:topRightEnabled="true">
+
+            <LinearLayout
+                android:id="@+id/progress_bg"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:gravity="center|left"
+                android:orientation="horizontal"
+                android:background="#FFFFFF">
+
+                <RelativeLayout
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:src="@drawable/round1" />
+
+                    <ProgressBar
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:indeterminate="true" />
+
+                    <ImageView
+                        android:id="@+id/progPoint"
+                        android:layout_width="9dp"
+                        android:layout_height="9dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_margin="5dp"
+                        android:src="@drawable/loadingpoint" />
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/app_main_logo" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:background="@null"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/progTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:fontFamily="serif"
+                        android:gravity="center|left"
+                        android:text="Checking Please Wait..."
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <ProgressBar
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="20dp"
+                        android:indeterminate="true" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.maxtunnel.app.RoundCornerLayout>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
