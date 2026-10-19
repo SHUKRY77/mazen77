@@ -1,4 +1,6 @@
-PluginManagement {
+import org.gradle.api.initialization.resolve.RepositoriesMode
+
+pluginManagement {
   repositories {
     gradlePluginPortal()
     google()
@@ -14,6 +16,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "alkhalidi"
+rootProject.name = "max-tunnel"
 
 include(":app")

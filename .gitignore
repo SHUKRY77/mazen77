@@ -7,3 +7,5 @@ local.properties
 app/release-key.jks
 *.keystore
 settings.gradle.kts.bak.original
+panel/config.php
+panel/data/

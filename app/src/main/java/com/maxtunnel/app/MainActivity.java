@@ -1321,6 +1321,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private ArrayList<ServerData> loadCustomPayloads() {
+        ArrayList<ServerData> result = new ArrayList<>();
+        try {
+            JSONArray array = new JSONArray(prefs.getString("custom_payloads", "[]"));
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject item = array.getJSONObject(i);
+                result.add(new ServerData(item.optString("name", "Custom Payload"),
+                        item.optString("config", ""), item.optString("subtitle", "Local custom payload")));
+            }
+        } catch (Exception ignored) {}
+        return result;
+    }
+
+    private void showAddPayloadDialog(final Dialog selectionDialog) {
+        LinearLayout form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
+        form.setPadding(48, 12, 48, 4);
+        EditText name = new EditText(this); name.setHint("اسم الشبكة / Payload");
+        EditText subtitle = new EditText(this); subtitle.setHint("الوصف (اختياري)");
+        EditText config = new EditText(this); config.setHint("اكتب Payload المصرح به هنا");
+        config.setMinLines(4); config.setGravity(Gravity.TOP);
+        config.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        form.addView(name); form.addView(subtitle); form.addView(config);
+        new AlertDialog.Builder(this).setTitle("إضافة Payload مخصص").setView(form)
+                .setNegativeButton("إلغاء", null)
+                .setPositiveButton("حفظ", (d, which) -> {
+                    String n = name.getText().toString().trim();
+                    String c = config.getText().toString();
+                    if (n.isEmpty() || c.trim().isEmpty()) {
+                        Toast.makeText(this, "اكتب اسم الـ Payload ومحتواه", Toast.LENGTH_SHORT).show(); return;
+                    }
+                    try {
+                        JSONArray array = new JSONArray(prefs.getString("custom_payloads", "[]"));
+                        JSONObject item = new JSONObject();
+                        item.put("name", n); item.put("subtitle", subtitle.getText().toString().trim()); item.put("config", c);
+                        array.put(item);
+                        prefs.edit().putString("custom_payloads", array.toString()).apply();
+                        selectedPayloadName = n; selectedPayloadLink = c; selectedPayloadSubtitle = subtitle.getText().toString().trim();
+                        prefs.edit().putString("selectedPayloadName", selectedPayloadName)
+                                .putString("selectedPayloadLink", selectedPayloadLink)
+                                .putString("selectedPayloadSubtitle", selectedPayloadSubtitle).apply();
+                        updateSelectionTexts(); selectionDialog.dismiss();
+                    } catch (Exception error) { Toast.makeText(this, "تعذر حفظ Payload", Toast.LENGTH_SHORT).show(); }
+                }).show();
+    }
+
     private void showSelectionDialog(final String type) {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_selection_list);
@@ -1397,6 +1443,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     } catch (Exception e) {}
                 }
+                serverDataList.addAll(loadCustomPayloads());
             }
 
             SmartListAdapter adapter = new SmartListAdapter(this, serverDataList, type.equals("Servers"),
@@ -1447,7 +1494,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } catch (Exception e) {}
 
         if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
-        if (btnCreate != null) btnCreate.setOnClickListener(v -> Toast.makeText(MainActivity.this, "Create button clicked", Toast.LENGTH_SHORT).show());
+        if (btnCreate != null) btnCreate.setOnClickListener(v -> {
+            if (type.equals("Networks")) showAddPayloadDialog(dialog);
+            else Toast.makeText(MainActivity.this, "إضافة السيرفرات تتم من اللوحة", Toast.LENGTH_SHORT).show();
+        });
         dialog.show();
     }
 
