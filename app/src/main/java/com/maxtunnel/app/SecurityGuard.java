@@ -50,6 +50,9 @@ public class SecurityGuard {
 
     // true إذا كان التوقيع صحيحاً (أو لم تُضبط البصمة بعد أثناء التطوير)
     public static boolean isSignatureValid(Context ctx) {
+        // APKs التي تُبنى للاختبار عبر GitHub Actions تكون موقعة بمفتاح Debug.
+        // لا نرفضها برسالة "نسخة غير رسمية"؛ فحص التوقيع يبقى مفعلًا في Release.
+        if (BuildConfig.DEBUG) return true;
         if (EXPECTED_SIG_SHA256 == null || EXPECTED_SIG_SHA256.isEmpty()) return true; // وضع التطوير
         String actual = getAppSignatureSha256(ctx);
         return !actual.isEmpty() && actual.equalsIgnoreCase(EXPECTED_SIG_SHA256);
