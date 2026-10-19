@@ -1,4 +1,4 @@
-package com.maxtunnel.app;
+package com.maxtunnel.vip;
 
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -47,10 +47,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.card.MaterialCardView;
 
-import com.maxtunnel.app.view.CircleProgressBar;
-import com.maxtunnel.app.view.LinearInView;
-import com.maxtunnel.app.view.LinearOutView;
-import com.maxtunnel.app.view.RotateLoading;
+import com.maxtunnel.vip.view.CircleProgressBar;
+import com.maxtunnel.vip.view.LinearInView;
+import com.maxtunnel.vip.view.LinearOutView;
+import com.maxtunnel.vip.view.RotateLoading;
 
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;

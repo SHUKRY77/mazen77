@@ -1,4 +1,4 @@
-package com.maxtunnel.app.view;
+package com.maxtunnel.vip.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

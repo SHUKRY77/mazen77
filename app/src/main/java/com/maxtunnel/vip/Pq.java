@@ -1,4 +1,4 @@
-package com.maxtunnel.app;
+package com.maxtunnel.vip;
 
 import java.util.ArrayList;
 import java.util.List;

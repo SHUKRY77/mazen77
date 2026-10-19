@@ -1,4 +1,4 @@
-package com.maxtunnel.app;
+package com.maxtunnel.vip;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;

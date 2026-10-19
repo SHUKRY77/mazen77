@@ -1,10 +1,10 @@
 plugins { id("com.android.application") }
 
 android {
-    namespace = "com.maxtunnel.app"
+    namespace = "com.maxtunnel.vip"
     compileSdk = 35
     defaultConfig {
-        applicationId = "com.maxtunnel.app"
+        applicationId = "com.maxtunnel.vip"
         minSdk = 23
         targetSdk = 35
         versionCode = 1

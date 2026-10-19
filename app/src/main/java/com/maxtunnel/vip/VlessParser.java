@@ -1,4 +1,4 @@
-package com.maxtunnel.app;
+package com.maxtunnel.vip;
 
 import java.net.URLDecoder;
 import java.util.HashMap;

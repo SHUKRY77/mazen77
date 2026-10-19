@@ -1,4 +1,4 @@
-package com.maxtunnel.app.view;
+package com.maxtunnel.vip.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,7 +10,7 @@ import android.util.TypedValue;
 import android.widget.FrameLayout;
 
 // استدعاء قاموس التطبيق الخاص بك
-import com.maxtunnel.app.R;
+import com.maxtunnel.vip.R;
 
 public class RoundCornerLayout extends FrameLayout {
     public boolean topLeftEnabled = true;

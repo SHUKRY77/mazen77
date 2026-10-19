@@ -1,4 +1,4 @@
-package com.maxtunnel.app;
+package com.maxtunnel.vip;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;

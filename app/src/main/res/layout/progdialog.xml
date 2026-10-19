@@ -17,7 +17,7 @@
         app:behavior_peekHeight="90dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <com.maxtunnel.app.RoundCornerLayout
+        <com.maxtunnel.vip.RoundCornerLayout
             android:layout_width="match_parent"
             android:layout_height="90dp"
             app:bottomLeftEnabled="false"
@@ -93,6 +93,6 @@
                         android:indeterminate="true" />
                 </LinearLayout>
             </LinearLayout>
-        </com.maxtunnel.app.RoundCornerLayout>
+        </com.maxtunnel.vip.RoundCornerLayout>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,4 +1,4 @@
-package com.maxtunnel.app;
+package com.maxtunnel.vip;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -33,8 +33,8 @@ import java.util.List;
 
 public class XrayVpnService extends VpnService {
 
-    public static final String ACTION_START_VPN = "com.maxtunnel.app.START_VPN";
-    public static final String ACTION_STOP_VPN = "com.maxtunnel.app.STOP_VPN";
+    public static final String ACTION_START_VPN = "com.maxtunnel.vip.START_VPN";
+    public static final String ACTION_STOP_VPN = "com.maxtunnel.vip.STOP_VPN";
 
     private ParcelFileDescriptor vpnInterface;
     private Process xrayProcess;

@@ -124,12 +124,12 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1.0">
                         
-                        <com.maxtunnel.app.DataWaveView
+                        <com.maxtunnel.vip.DataWaveView
                             android:id="@+id/dataWaveView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
 
-                        <com.maxtunnel.app.view.LinearOutView
+                        <com.maxtunnel.vip.view.LinearOutView
                             android:layout_gravity="center"
                             android:id="@+id/mDataOut"
                             android:layout_width="match_parent"
@@ -142,7 +142,7 @@
                             app:strokeWidth="1dp"
                             android:visibility="invisible" />
 
-                        <com.maxtunnel.app.view.LinearInView
+                        <com.maxtunnel.vip.view.LinearInView
                             android:layout_gravity="center"
                             android:id="@+id/mDataIn"
                             android:layout_width="match_parent"
@@ -477,7 +477,7 @@
                                             android:layout_height="wrap_content"
                                             android:layout_marginLeft="10dp"
                                             android:layout_marginRight="10dp">
-                                            <com.maxtunnel.app.view.RoundCornerLayout
+                                            <com.maxtunnel.vip.view.RoundCornerLayout
                                                 android:layout_width="35dp"
                                                 android:layout_height="35dp"
                                                 app:bottomLeftEnabled="true"
@@ -498,7 +498,7 @@
                                                         android:layout_height="35dp"
                                                         android:src="@drawable/app_main_logo" />
                                                 </RelativeLayout>
-                                            </com.maxtunnel.app.view.RoundCornerLayout>
+                                            </com.maxtunnel.vip.view.RoundCornerLayout>
                                             <LinearLayout
                                                 android:orientation="vertical"
                                                 android:layout_width="0dp"
@@ -663,7 +663,7 @@
                                                 android:layout_height="match_parent"
                                                 android:layout_marginLeft="10dp"
                                                 android:layout_marginRight="10dp">
-                                                <com.maxtunnel.app.view.RoundCornerLayout
+                                                <com.maxtunnel.vip.view.RoundCornerLayout
                                                     android:layout_width="35dp"
                                                     android:layout_height="35dp"
                                                     app:bottomLeftEnabled="true"
@@ -683,7 +683,7 @@
                                                             android:layout_height="35dp"
                                                             android:src="@drawable/app_main_logo" />
                                                     </RelativeLayout>
-                                                </com.maxtunnel.app.view.RoundCornerLayout>
+                                                </com.maxtunnel.vip.view.RoundCornerLayout>
                                                 <LinearLayout
                                                     android:orientation="vertical"
                                                     android:layout_width="0dp"
@@ -953,7 +953,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="20dp"
                     android:layout_centerInParent="true" />
-                <com.maxtunnel.app.view.RotateLoading
+                <com.maxtunnel.vip.view.RotateLoading
                     android:id="@+id/mRotateLoading"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -962,7 +962,7 @@
                     app:loading_color="@color/colorAccent"
                     app:loading_visible="false"
                     app:loading_width="8dp" />
-                <com.maxtunnel.app.view.CircleProgressBar
+                <com.maxtunnel.vip.view.CircleProgressBar
                     android:id="@+id/circle_progress"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

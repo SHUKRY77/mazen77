@@ -1,4 +1,4 @@
-package com.maxtunnel.app.view;
+package com.maxtunnel.vip.view;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class LinearOutView extends View {
+public class LinearInView extends View {
     public List<Float> A;
     public int B = 200;
     public float I = 1.0f;
@@ -26,7 +26,7 @@ public class LinearOutView extends View {
     public int Q1 = 1;
     public float T = 0.0f;
     public int a = 10;
-    public int b = Color.parseColor("#FF5252"); // أحمر
+    public int b = Color.parseColor("#00E676"); // أخضر
     public int c;
     public RectF fRect;
     public Paint h;
@@ -37,13 +37,13 @@ public class LinearOutView extends View {
         public a() {}
         @Override
         public void onAnimationUpdate(ValueAnimator valueAnimator) {
-            LinearOutView.this.I = ((Float) valueAnimator.getAnimatedValue()).floatValue();
-            LinearOutView.this.invalidate();
+            LinearInView.this.I = ((Float) valueAnimator.getAnimatedValue()).floatValue();
+            LinearInView.this.invalidate();
         }
     }
 
-    public LinearOutView(Context context) { super(context); init(); }
-    public LinearOutView(Context context, AttributeSet attributeSet) { super(context, attributeSet); init(); }
+    public LinearInView(Context context) { super(context); init(); }
+    public LinearInView(Context context, AttributeSet attributeSet) { super(context, attributeSet); init(); }
 
     private void init() {
         this.c = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, getResources().getDisplayMetrics());
@@ -80,7 +80,7 @@ public class LinearOutView extends View {
             float f5 = this.fRect.bottom - ((fFloatValue2 - this.O1) * this.N1);
             if (i2 != 0) {
                 float f6 = f3 + ((f4 - f3) * 0.5f);
-                path.cubicTo(f6, f2, f6, f5, f4, f5);
+                path.cubicTo(f6, f2, f6, f5, f4, f5); // التموج النقي
             } else {
                 path.moveTo(f4, f5);
             }
@@ -137,7 +137,7 @@ public class LinearOutView extends View {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (this.s == null || this.s.isEmpty()) return;
-        canvas.drawPath(c(), this.h); 
+        canvas.drawPath(c(), this.h); // رسم الخط النقي فقط
     }
 
     @Override
