@@ -30,6 +30,22 @@ function db(): PDO {
     $pdo->exec('CREATE TABLE IF NOT EXISTS servers (id TEXT PRIMARY KEY, country TEXT NOT NULL, subtitle TEXT NOT NULL, protocol TEXT NOT NULL, host TEXT NOT NULL, port INTEGER NOT NULL, sni TEXT NOT NULL DEFAULT \'\', network TEXT NOT NULL DEFAULT \'tcp\', path TEXT NOT NULL DEFAULT \'/\', secret_enc TEXT NOT NULL DEFAULT \'\', ssh_user_enc TEXT NOT NULL DEFAULT \'\', ssh_pass_enc TEXT NOT NULL DEFAULT \'\', public_config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT, event TEXT NOT NULL, ip_hash TEXT NOT NULL, created_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS payloads (id TEXT PRIMARY KEY, network TEXT NOT NULL, subtitle TEXT NOT NULL, config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
+    foreach ([
+        'target_app TEXT NOT NULL DEFAULT "Max Tunnel"',
+        'carrier TEXT NOT NULL DEFAULT ""',
+        'tls INTEGER NOT NULL DEFAULT 0',
+        'tls_version TEXT NOT NULL DEFAULT "default"',
+        'fingerprint TEXT NOT NULL DEFAULT "chrome"',
+        'alpn TEXT NOT NULL DEFAULT ""',
+        'proxy TEXT NOT NULL DEFAULT ""',
+        'payload TEXT NOT NULL DEFAULT ""',
+        'service_name TEXT NOT NULL DEFAULT ""',
+        'reality_public_key TEXT NOT NULL DEFAULT ""',
+        'reality_short_id TEXT NOT NULL DEFAULT ""',
+        'reality_dest TEXT NOT NULL DEFAULT ""'
+    ] as $column) {
+        try { $pdo->exec('ALTER TABLE servers ADD COLUMN '.$column); } catch (Throwable $ignored) {}
+    }
     return $pdo;
 }
 
