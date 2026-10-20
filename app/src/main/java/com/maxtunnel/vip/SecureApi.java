@@ -24,7 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecureApi {
     private static final String HANDSHAKE_KEY = "Hx7K9pQ2mWvN4bRt6Ys1Zc8Df3Ge0La5Pj2Uq=";
     private static final String API_SECURE_KEY = "MazenDatabaseSecureKey2026@Vip!";
-    private static final String BASE_URL = "https://app.assag2026.com/core.php";
+    private static final String BASE_URL = "https://max2.shukry.online/core.php";
     private static final int CLOCK_SKEW_SECONDS = 90;
 
     public static class Session {
