@@ -9,6 +9,7 @@ $PANEL_CONFIG = [
     'API_SECURE_KEY' => 'CHANGE_ME_API_SECURE_KEY',
     // مفتاح مختلف تماماً لتشفير كلمات المرور داخل SQLite.
     'APP_MASTER_KEY' => 'CHANGE_ME_RANDOM_64_CHAR_MASTER_KEY',
+    'ADMIN_USERNAME' => 'maxadmin',
     // كلمة مرور الإدارة الأولى؛ غيّرها بعد أول دخول.
     'ADMIN_PASSWORD' => 'CHANGE_ME_LONG_ADMIN_PASSWORD',
 ];

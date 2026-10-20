@@ -23,9 +23,39 @@ $session = ip_bound_token($token, $did);
 if (!$session) json_out(['status'=>'error','message'=>'Session expired'], 401);
 if ($action === 'get_max_app_data') {
     if (!timing_safe(hmac_for($did.'|'.$token.'|'.$ts), $sig)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
-    $rows = db()->query('SELECT id,country,subtitle,public_config AS config FROM servers WHERE active=1 ORDER BY country,id')->fetchAll();
+    $rows = db()->query('SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config FROM servers WHERE active=1 ORDER BY country,id')->fetchAll();
+    foreach ($rows as &$row) {
+        if (str_starts_with((string)$row['protocol'], 'ssh') || $row['protocol'] === 'dnstt') {
+            $type = match ($row['protocol']) {
+                'ssh' => 'direct',
+                'ssh-proxy', 'ssh-tls', 'ssh-tls-proxy' => 'ssl_proxy',
+                'dnstt' => 'slowdns',
+                default => 'ssl_payload',
+            };
+            $proxyHost = '';
+            $proxyPort = '80';
+            if (preg_match('/^([^:]+):(\d+)$/', (string)$row['proxy'], $pm)) {
+                $proxyHost = $pm[1]; $proxyPort = $pm[2];
+            }
+            $row['config'] = 'SSH_PAYLOAD|'.$type.'|'.str_replace('|', '', (string)$row['sni']).'|'.str_replace('|', '', $proxyHost).'|'.$proxyPort.'|'.str_replace('|', '', (string)$row['payload']).'|'.str_replace('|', '', $row['host'].':'.$row['port']).'|'.$row['id'];
+        } else {
+            $row['config'] = $row['public_config'];
+        }
+        unset($row['host'], $row['port'], $row['sni'], $row['proxy'], $row['payload'], $row['public_config']);
+    }
+    unset($row);
     $payloads = db()->query('SELECT network,subtitle,config FROM payloads WHERE active=1 ORDER BY network,id')->fetchAll();
-    $serverPayloads = db()->query("SELECT COALESCE(NULLIF(carrier,''), country) AS network, protocol AS subtitle, payload AS config FROM servers WHERE active=1 ORDER BY network,country,id")->fetchAll();
+    $serverPayloads = [];
+    foreach ($rows as $serverRow) {
+        $serverPayloads[] = [
+            'network' => $serverRow['carrier'] !== '' ? $serverRow['carrier'] : $serverRow['country'],
+            'subtitle' => $serverRow['protocol'],
+            'config' => $serverRow['config'],
+        ];
+        unset($serverRow['carrier'], $serverRow['protocol']);
+    }
+    foreach ($rows as &$row) { unset($row['carrier'], $row['protocol']); }
+    unset($row);
     $payloads = array_merge($payloads, $serverPayloads);
     $rows = array_merge($rows, $payloads);
     json_out(['status'=>'success','data'=>encrypt_response(json_encode($rows, JSON_UNESCAPED_SLASHES), session_key($session['snonce']))]);
