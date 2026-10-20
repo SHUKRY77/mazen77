@@ -25,6 +25,8 @@ if ($action === 'get_max_app_data') {
     if (!timing_safe(hmac_for($did.'|'.$token.'|'.$ts), $sig)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
     $rows = db()->query('SELECT id,country,subtitle,public_config AS config FROM servers WHERE active=1 ORDER BY country,id')->fetchAll();
     $payloads = db()->query('SELECT network,subtitle,config FROM payloads WHERE active=1 ORDER BY network,id')->fetchAll();
+    $serverPayloads = db()->query("SELECT COALESCE(NULLIF(carrier,''), country) AS network, protocol AS subtitle, payload AS config FROM servers WHERE active=1 AND payload IS NOT NULL AND payload<>'' ORDER BY network,country,id")->fetchAll();
+    $payloads = array_merge($payloads, $serverPayloads);
     $rows = array_merge($rows, $payloads);
     json_out(['status'=>'success','data'=>encrypt_response(json_encode($rows, JSON_UNESCAPED_SLASHES), session_key($session['snonce']))]);
 }
