@@ -49,7 +49,15 @@ function db(): PDO {
     return $pdo;
 }
 
-function client_ip_hash(): string { return hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . '|' . cfg('APP_MASTER_KEY')); }
+function client_ip_hash(): string {
+    // عند المرور عبر Cloudflare قد يتغير REMOTE_ADDR بين طلب المصافحة وطلب creds.
+    // نستخدم عنوان العميل الحقيقي الذي يثبته Cloudflare، مع الرجوع للعنوان المباشر.
+    $ip = trim((string)($_SERVER['HTTP_CF_CONNECTING_IP'] ?? ''));
+    if ($ip === '' || !filter_var($ip, FILTER_VALIDATE_IP)) {
+        $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+    }
+    return hash('sha256', $ip . '|' . cfg('APP_MASTER_KEY'));
+}
 function json_out(array $data, int $status = 200): never { http_response_code($status); header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store'); echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
 function require_post(): void { if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') json_out(['status'=>'error','message'=>'POST required'], 405); }
 function random_hex(int $bytes = 32): string { return bin2hex(random_bytes($bytes)); }
