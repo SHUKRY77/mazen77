@@ -57,8 +57,14 @@ if ($action === 'get_max_app_data') {
                 'config' => $serverRow['config'],
             ];
         } else {
+            $networkName = $serverRow['carrier'] !== '' ? $serverRow['carrier'] : $serverRow['country'];
             unset($serverRow['carrier'], $serverRow['protocol']);
             $topRows[] = $serverRow;
+            $serverPayloads[] = [
+                'network' => $networkName,
+                'subtitle' => $serverRow['subtitle'],
+                'config' => $serverRow['config'],
+            ];
         }
     }
     $rows = $topRows;
