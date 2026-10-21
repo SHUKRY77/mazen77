@@ -120,6 +120,7 @@ $pv = fn($k,$d='') => $esc($editPayload[$k] ?? $d);
 <?php if ($mode==='ssh'): ?>
 <div><label>Protocol</label><select name="protocol"><option value="ssh">SSH-Direct</option><option value="ssh-proxy">SSH-Proxy</option><option value="ssh-payload">SSH-Payload</option><option value="ssh-proxy-payload">SSH-Proxy-Payload</option><option value="ssh-tls">SSH-TLS</option><option value="ssh-tls-proxy">SSH-TLS-Proxy</option><option value="ssh-tls-payload">SSH-TLS-Payload</option><option value="ssh-tls-proxy-payload">SSH-TLS-Proxy-Payload</option><option value="dnstt">SSH-DNSTT</option></select></div>
 <div><label>Remarks</label><input name="country" required value="<?=$sv('country')?>" placeholder="STC Fast 2026"></div>
+<div><label>Network Name</label><input name="carrier" value="<?=$sv('carrier')?>" placeholder="STC"></div>
 <div><label>Subtitle</label><input name="subtitle" value="<?=$sv('subtitle')?>"></div>
 <div><label>SSH Host</label><input name="host" required value="<?=$sv('host')?>"></div>
 <div><label>SSH Port</label><input type="number" name="port" value="<?=$sv('port','22')?>"></div>
@@ -134,6 +135,7 @@ $pv = fn($k,$d='') => $esc($editPayload[$k] ?? $d);
 <?php else: ?>
 <div><label>Protocol</label><select name="protocol"><option value="vless">VLESS</option><option value="vmess">VMess</option><option value="trojan">Trojan</option></select></div>
 <div><label>Remarks</label><input name="country" required value="<?=$sv('country')?>" placeholder="اسم الدولة أو السيرفر"></div>
+<div><label>Network Name</label><input name="carrier" value="<?=$sv('carrier')?>" placeholder="STC / Zain / Mobily"></div>
 <div><label>Subtitle</label><input name="subtitle" value="<?=$sv('subtitle')?>"></div>
 <div class="full"><label>Config URL</label><textarea name="public_config" required placeholder="vless://AUTH@example.com:443?...&_sid={ID}"><?=$sv('public_config')?></textarea></div>
 <div><label>UUID / Password</label><input type="password" name="secret" autocomplete="new-password"></div>

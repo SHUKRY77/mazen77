@@ -51,7 +51,7 @@ if ($action === 'get_max_app_data') {
     foreach ($rows as $serverRow) {
         $serverPayloads[] = [
             'network' => $serverRow['carrier'] !== '' ? $serverRow['carrier'] : $serverRow['country'],
-            'subtitle' => $serverRow['protocol'],
+            'subtitle' => $serverRow['subtitle'] !== '' ? $serverRow['subtitle'] : $serverRow['protocol'],
             'config' => $serverRow['config'],
         ];
         unset($serverRow['carrier'], $serverRow['protocol']);
