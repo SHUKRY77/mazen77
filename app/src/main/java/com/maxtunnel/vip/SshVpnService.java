@@ -171,6 +171,12 @@ public class SshVpnService extends VpnService {
                     Pq.p("وضع الاتصال: Direct SSH (تم تفعيله بنجاح ✔️)");
                 } else if (connType.equals(CONN_TYPE_UDP)) {
                     Pq.p("وضع الاتصال: SSH UDP / BadVPN (تم تفعيله بنجاح ✔️)");
+                } else if (connType.equals("http_proxy")) {
+                    Pq.p("وضع الاتصال: SSH Proxy (HTTP CONNECT)");
+                    sshSession.setProxy(new HttpConnectProxy(squidIp, squidPort, sshHostField));
+                } else if (connType.equals("tls_direct")) {
+                    Pq.p("وضع الاتصال: SSH TLS مباشر");
+                    sshSession.setProxy(new TlsDirectProxy(sni));
                 } else if (connType.equals(CONN_TYPE_SSL_PROXY)) {
                     Pq.p("وضع الاتصال: SSL Proxy (تم تفعيله بنجاح ✔️️)");
                     sshSession.setProxy(new SslConnectProxy(squidIp, squidPort, sni, sshHostField));

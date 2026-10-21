@@ -28,7 +28,9 @@ if ($action === 'get_max_app_data') {
         if (str_starts_with((string)$row['protocol'], 'ssh') || $row['protocol'] === 'dnstt') {
             $type = match ($row['protocol']) {
                 'ssh' => 'direct',
-                'ssh-proxy', 'ssh-tls', 'ssh-tls-proxy' => 'ssl_proxy',
+                'ssh-proxy' => 'http_proxy',
+                'ssh-tls' => 'tls_direct',
+                'ssh-tls-proxy' => 'ssl_proxy',
                 'dnstt' => 'slowdns',
                 default => 'ssl_payload',
             };

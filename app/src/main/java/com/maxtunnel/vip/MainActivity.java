@@ -719,9 +719,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String getLinkToTest() {
-        if (selectedPayloadLink != null && !selectedPayloadLink.isEmpty()) return selectedPayloadLink;
+        if (selectedServerLink != null && selectedServerLink.startsWith("SSH_PAYLOAD|")) {
+            String serverSid = extractSelectionSid(selectedServerLink);
+            String payloadSid = extractSelectionSid(selectedPayloadLink);
+            if (selectedPayloadLink != null && selectedPayloadLink.startsWith("SSH_PAYLOAD|")
+                    && serverSid != null && serverSid.equals(payloadSid)) return selectedPayloadLink;
+            return selectedServerLink;
+        }
         if (selectedServerLink != null && !selectedServerLink.isEmpty()) return selectedServerLink;
+        if (selectedPayloadLink != null && !selectedPayloadLink.isEmpty()) return selectedPayloadLink;
         return "";
+    }
+
+    private static String extractSelectionSid(String link) {
+        if (link == null) return null;
+        int p = link.lastIndexOf('|');
+        return p >= 0 && p + 1 < link.length() ? link.substring(p + 1) : null;
     }
 
     private void proceedWithVpnConnection() {
