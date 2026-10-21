@@ -1452,9 +1452,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     selectedServerName = data.name;
                     selectedServerLink = data.link;
                     selectedServerSubtitle = data.subtitle;
-                    prefs.edit().putString("selectedServerName", selectedServerName)
+                    android.content.SharedPreferences.Editor editor = prefs.edit()
+                                .putString("selectedServerName", selectedServerName)
                                 .putString("selectedServerLink", selectedServerLink)
-                                .putString("selectedServerSubtitle", selectedServerSubtitle).apply();
+                                .putString("selectedServerSubtitle", selectedServerSubtitle);
+                    // اختيار سيرفر علوي جديد يلغي Payload قديمًا من جلسة سابقة.
+                    // يبقى Auto select فارغًا ليسمح باختيار الشبكة السفلية.
+                    if (data.link != null && !data.link.isEmpty()) {
+                        selectedPayloadName = "Select Network Payload";
+                        selectedPayloadLink = "";
+                        selectedPayloadSubtitle = "V2Ray / SSH Network";
+                        editor.putString("selectedPayloadName", selectedPayloadName)
+                              .putString("selectedPayloadLink", "")
+                              .putString("selectedPayloadSubtitle", selectedPayloadSubtitle);
+                    }
+                    editor.apply();
                 } else {
                     selectedPayloadName = data.name;
                     selectedPayloadLink = data.link;
