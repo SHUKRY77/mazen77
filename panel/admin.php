@@ -122,7 +122,7 @@ $pv = fn($k,$d='') => $esc($editPayload[$k] ?? $d);
 <form method="post">
 <input type="hidden" name="csrf" value="<?=$csrf?>"><input type="hidden" name="action" value="save_server"><input type="hidden" name="id" value="<?=$sv('id')?>">
 <div class="grid">
-<div><label>التطبيق المستهدف</label><select name="target_app"><option>Max Tunnel</option><option>Vortex Pro</option></select></div>
+<div><label>التطبيق المستهدف</label><input type="hidden" name="target_app" value="Max Tunnel"><span class="pill">Max Tunnel فقط</span></div>
 <?php if ($mode==='ssh'): ?>
 <div><label>Protocol</label><select name="protocol"><option value="ssh">SSH-Direct</option><option value="ssh-proxy">SSH-Proxy</option><option value="ssh-payload">SSH-Payload</option><option value="ssh-proxy-payload">SSH-Proxy-Payload</option><option value="ssh-tls">SSH-TLS</option><option value="ssh-tls-proxy">SSH-TLS-Proxy</option><option value="ssh-tls-payload">SSH-TLS-Payload</option><option value="ssh-tls-proxy-payload">SSH-TLS-Proxy-Payload</option><option value="dnstt">SSH-DNSTT</option></select></div>
 <div><label>Remarks / Country Name</label><input name="country" required value="<?=$sv('country')?>" placeholder="ألمانيا 🇩🇪 أو اسم السيرفر"></div>

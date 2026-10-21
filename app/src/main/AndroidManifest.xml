@@ -31,7 +31,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-8090698487945807~3910973773" />
             
-        <!-- 🌟 إضافة معرف تطبيق Start.io الخاص بـ max vip 🌟 -->
+        <!-- 🌟 إضافة معرف تطبيق Start.io الخاص بـ Max Tunnel 🌟 -->
         <meta-data
             android:name="com.startapp.sdk.APPLICATION_ID"
             android:value="208638219" />

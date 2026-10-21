@@ -55,7 +55,7 @@ public class AdvanceSettingsActivity extends AppCompatActivity {
         // إعداد الشريط العلوي (Toolbar)
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         if (toolbar != null) {
-            toolbar.setTitle("KING VPN"); 
+            toolbar.setTitle("Max Tunnel");
             toolbar.setSubtitle("Advance Settings");
             toolbar.setBackgroundColor(Color.parseColor("#00E676")); 
             toolbar.setTitleTextColor(Color.WHITE);

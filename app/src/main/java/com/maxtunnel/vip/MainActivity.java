@@ -288,8 +288,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         case 1:
                             Intent shareIntent = new Intent(Intent.ACTION_SEND);
                             shareIntent.setType("text/plain");
-                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "KING VPN");
-                            shareIntent.putExtra(Intent.EXTRA_TEXT, "Download the best VPN: KING VPN now!");
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Max Tunnel");
+                            shareIntent.putExtra(Intent.EXTRA_TEXT, "Download the best VPN: Max Tunnel now!");
                             startActivity(Intent.createChooser(shareIntent, "Share App Link"));
                             return true;
                         case 2:
@@ -854,7 +854,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter filter = new IntentFilter("KING_VPN_STATE");
+        IntentFilter filter = new IntentFilter("MAX_TUNNEL_STATE");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(vpnStateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
         } else {

@@ -21,7 +21,7 @@ public class V2raySettingsActivity extends AppCompatActivity {
         // إعداد الشريط العلوي (Toolbar)
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         if (toolbar != null) {
-            toolbar.setTitle("KING VPN"); 
+            toolbar.setTitle("Max Tunnel");
             toolbar.setSubtitle("V2Ray Settings");
             
             // ضبط ألوان الشريط العلوي

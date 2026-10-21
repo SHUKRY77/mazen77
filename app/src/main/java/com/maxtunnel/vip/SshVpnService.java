@@ -77,9 +77,9 @@ public class SshVpnService extends VpnService {
     }
 
     private void showNotification(String text) {
-        String CHANNEL_ID = "KING_VPN_CHANNEL";
+        String CHANNEL_ID = "MAX_TUNNEL_CHANNEL";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "KING VPN", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Max Tunnel", NotificationManager.IMPORTANCE_LOW);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) manager.createNotificationChannel(channel);
         }
@@ -96,7 +96,7 @@ public class SshVpnService extends VpnService {
                 ? new Notification.Builder(this, CHANNEL_ID)
                 : new Notification.Builder(this);
 
-        startForeground(1, builder.setContentTitle("KING VPN Service")
+        startForeground(1, builder.setContentTitle("Max Tunnel Service")
                 .setContentText(text)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
@@ -104,7 +104,7 @@ public class SshVpnService extends VpnService {
     }
 
     private void sendStateToUI(String state, String message) {
-        Intent intent = new Intent("KING_VPN_STATE");
+        Intent intent = new Intent("MAX_TUNNEL_STATE");
         intent.putExtra("state", state);
         intent.putExtra("msg", message);
         intent.setPackage(getPackageName());
@@ -206,7 +206,7 @@ public class SshVpnService extends VpnService {
                 Pq.p("Configuring network interface...");
 
                 Builder builder = new Builder()
-                        .setSession("KING-SSH")
+                        .setSession("MAX-TUNNEL-SSH")
                         .setMtu(1400)
                         .addAddress("10.0.8.2", 24)
                         .addRoute("0.0.0.0", 0)

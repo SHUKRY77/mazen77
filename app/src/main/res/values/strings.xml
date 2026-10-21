@@ -3,8 +3,8 @@
     <string name="app_name">Max Tunnel</string>
     <string name="app_copyright">All Rights Reserved</string>
     
-    <string name="app_name_before">MAX-</string>
-    <string name="app_name_after">vip</string>
+    <string name="app_name_before">Max </string>
+    <string name="app_name_after">Tunnel</string>
     
     <string name="title_tethering_subnet">Tethering Subnet</string>
     <string name="summary_tethering_subnet">Set subnet for hotspot sharing</string>

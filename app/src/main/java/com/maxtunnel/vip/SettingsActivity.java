@@ -21,7 +21,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.settings_preferences);
 
         // تجهيز الذاكرة لحفظ إعدادات المستخدم
-        prefs = getSharedPreferences("KING_VPN_SETTINGS", MODE_PRIVATE);
+        prefs = getSharedPreferences("MAX_TUNNEL_SETTINGS", MODE_PRIVATE);
         editor = prefs.edit();
 
         // 1. إعداد شريط العنوان (Toolbar)
