@@ -20,7 +20,13 @@ if (empty($_SESSION['admin'])) {
         $error = 'بيانات الدخول غير صحيحة';
     }
     ?><!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Max Tunnel Admin</title>
-    <style>body{font-family:Arial;background:#0b1220;color:#fff;max-width:430px;margin:12vh auto;padding:24px}input,button{box-sizing:border-box;width:100%;padding:13px;margin:8px 0;border-radius:9px;border:0}button{background:#2563eb;color:white;font-weight:bold}.err{color:#fca5a5}</style>
+    <style>
+:root{--primary:#c62828;--primary-light:#ffcdd2;--bg:#f8fafc;--border:#e2e8f0;--success:#22c55e;--danger:#ef4444;--muted:#64748b}
+*{box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}body{margin:0;background:var(--bg);color:#334155;min-height:100vh}
+.top{height:60px;background:var(--primary);color:#fff;padding:0 25px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 5px #0002}.top a{color:#fff;text-decoration:none;font-weight:bold}
+.layout{display:flex;min-height:calc(100vh - 60px)}aside{width:260px;background:#fff;border-right:1px solid var(--border);padding:15px 0;flex-shrink:0}aside a{display:block;color:#334155;text-decoration:none;padding:13px 25px;font-size:15px;font-weight:600;margin:2px 0}aside a:hover,aside a.active{background:var(--primary-light);color:var(--primary);border-left:4px solid var(--primary)}
+.main{flex:1;padding:25px;max-width:1500px;overflow-x:hidden}.cards{display:flex;gap:20px;flex-wrap:wrap}.card,.stat{background:#fff;border:1px solid var(--border);border-radius:8px;padding:20px;margin:0 0 20px;box-shadow:0 4px 6px #0000000a}.stat{flex:1;min-width:200px;text-align:center;border-top:4px solid var(--primary)}.stat strong{font-size:35px;display:block;color:var(--primary);margin-top:8px}h1{margin-top:0;color:#334155}h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.grid .full{grid-column:1/-1}label{display:block;font-weight:bold;font-size:13px;color:#475569;margin-top:5px}input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;margin:8px 0 15px;background:#fff;font-size:14px}textarea{min-height:90px;direction:ltr}.check{display:flex;gap:8px;align-items:center;margin:5px 0 12px}.check input{width:auto}.actions{display:flex;gap:8px;flex-wrap:wrap}button,.btn{border:0;border-radius:6px;background:var(--primary);color:#fff;padding:12px 20px;cursor:pointer;text-decoration:none;display:inline-block;font-weight:bold;text-transform:uppercase}.danger{background:var(--danger)}.muted{color:var(--muted);font-size:12px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;background:#fff;min-width:700px}th,td{padding:14px 12px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap;font-size:14px}.pill{background:#dcfce7;color:#15803d;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:bold}.section{border-top:1px solid var(--border);margin-top:12px;padding-top:12px}@media(max-width:768px){.layout{display:block}aside{width:100%;border-right:0;border-bottom:1px solid var(--border);padding:5px}aside a{display:inline-block;padding:9px 10px;font-size:12px}.main{padding:12px}.grid{grid-template-columns:1fr}.grid .full{grid-column:auto}.top{padding:0 14px}}
+</style>
     <h2>Max Tunnel — تسجيل الدخول</h2><?php if ($error) echo '<p class="err">'.h($error).'</p>'; ?><form method="post"><input type="hidden" name="action" value="login"><input type="text" name="username" placeholder="اسم المستخدم" required autofocus><input type="password" name="password" placeholder="كلمة المرور" required><button>دخول آمن</button></form></html><?php exit;
 }
 
@@ -119,25 +125,24 @@ $pv = fn($k,$d='') => $esc($editPayload[$k] ?? $d);
 <div><label>التطبيق المستهدف</label><select name="target_app"><option>Max Tunnel</option><option>Vortex Pro</option></select></div>
 <?php if ($mode==='ssh'): ?>
 <div><label>Protocol</label><select name="protocol"><option value="ssh">SSH-Direct</option><option value="ssh-proxy">SSH-Proxy</option><option value="ssh-payload">SSH-Payload</option><option value="ssh-proxy-payload">SSH-Proxy-Payload</option><option value="ssh-tls">SSH-TLS</option><option value="ssh-tls-proxy">SSH-TLS-Proxy</option><option value="ssh-tls-payload">SSH-TLS-Payload</option><option value="ssh-tls-proxy-payload">SSH-TLS-Proxy-Payload</option><option value="dnstt">SSH-DNSTT</option></select></div>
-<div><label>Remarks</label><input name="country" required value="<?=$sv('country')?>" placeholder="STC Fast 2026"></div>
-<div><label>Network Name</label><input name="carrier" value="<?=$sv('carrier')?>" placeholder="STC"></div>
-<div><label>Subtitle</label><input name="subtitle" value="<?=$sv('subtitle')?>"></div>
-<div><label>SSH Host</label><input name="host" required value="<?=$sv('host')?>"></div>
-<div><label>SSH Port</label><input type="number" name="port" value="<?=$sv('port','22')?>"></div>
-<div><label>Udpgw Port</label><input type="number" name="udpgw_port" value="<?=$sv('udpgw_port','7300')?>"></div>
-<div><label>Proxy host:port</label><input name="proxy" value="<?=$sv('proxy')?>"></div>
-<div><label>TLS Version</label><select name="tls_version"><option value="default">Default</option><option>1.1</option><option>1.2</option><option>1.3</option></select></div>
+<div><label>Remarks / Country Name</label><input name="country" required value="<?=$sv('country')?>" placeholder="ألمانيا 🇩🇪 أو اسم السيرفر"></div>
+<div><label>Network Name</label><input name="carrier" value="<?=$sv('carrier')?>" placeholder="STC, Zain..."></div>
+<div><label>Subtitle</label><input name="subtitle" value="<?=$sv('subtitle')?>" placeholder="Send: 1100 Type: 8294"></div>
+<div><label>SSH Host (Server IP / Domain)</label><input name="host" required value="<?=$sv('host')?>"></div>
 <div><label>SNI / Server Name Indication</label><input name="sni" value="<?=$sv('sni')?>"></div>
-<div class="full"><label>Payload template</label><textarea name="payload" placeholder="اكتب Payload المصرح به هنا"><?=$sv('payload')?></textarea></div>
-<div><label>SSH Username</label><input name="ssh_user" value=""></div>
-<div><label>SSH Password</label><input type="password" name="ssh_pass" value=""></div>
+<div><label>Custom SSL / SSH Port</label><input type="number" name="port" value="<?=$sv('port','22')?>"></div>
+<div class="full"><label>Payload <span class="muted">(يتم تخزينه مشفرًا)</span></label><textarea name="payload" placeholder="GET / HTTP/1.1[crlf]Host: domain.com[crlf]Connection: Upgrade[crlf][crlf]"><?=$sv('payload')?></textarea></div>
+<div><label>SSH Username</label><input name="ssh_user" value="" autocomplete="off"></div>
+<div><label>SSH Password</label><input type="password" name="ssh_pass" value="" autocomplete="new-password"></div>
+<div><label>Squid Proxy / IP</label><input name="proxy" value="<?=$sv('proxy')?>" placeholder="proxy.example.com:443"></div>
+<div><label>TLS Version</label><select name="tls_version"><option value="default">Default</option><option>1.1</option><option>1.2</option><option>1.3</option></select></div>
 <input type="hidden" name="network" value="tcp"><input type="hidden" name="public_config" value="<?=$sv('public_config')?>"><input type="hidden" name="secret" value="<?=$sv('secret')?>">
 <?php else: ?>
 <div><label>Protocol</label><select name="protocol"><option value="vless">VLESS</option><option value="vmess">VMess</option><option value="trojan">Trojan</option></select></div>
-<div><label>Remarks</label><input name="country" required value="<?=$sv('country')?>" placeholder="اسم الدولة أو السيرفر"></div>
-<div><label>Network Name</label><input name="carrier" value="<?=$sv('carrier')?>" placeholder="STC / Zain / Mobily"></div>
-<div><label>Subtitle</label><input name="subtitle" value="<?=$sv('subtitle')?>"></div>
+<div><label>Country Name / Remarks</label><input name="country" required value="<?=$sv('country')?>" placeholder="ألمانيا 🇩🇪 أو اسم السيرفر"></div>
+<div><label>Network</label><input name="carrier" value="<?=$sv('carrier')?>" placeholder="STC / Zain / Mobily"></div>
 <div class="full"><label>Config URL</label><textarea name="public_config" required placeholder="vless://AUTH@example.com:443?...&_sid={ID}"><?=$sv('public_config')?></textarea></div>
+<div><label>Subtitle</label><input name="subtitle" value="<?=$sv('subtitle')?>" placeholder="Send: 1100 Type: 8294"></div>
 <div><label>UUID / Password</label><input type="password" name="secret" autocomplete="new-password"></div>
 <input type="hidden" name="host" value="<?=$sv('host')?>"><input type="hidden" name="port" value="<?=$sv('port','443')?>"><input type="hidden" name="network" value="<?=$sv('network','tcp')?>">
 <?php endif; ?>
