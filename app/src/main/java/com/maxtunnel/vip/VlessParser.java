@@ -69,6 +69,8 @@ public class VlessParser {
             String host = q.containsKey("host") ? q.get("host") : "";
             String path = q.containsKey("path") ? q.get("path") : "";
             String sni = q.containsKey("sni") ? q.get("sni") : "";
+            String alpn = q.containsKey("alpn") ? q.get("alpn") : "";
+            String fp = q.containsKey("fp") ? q.get("fp") : "";
 
             if (security == null || security.isEmpty()) security = "none";
             if (type == null || type.isEmpty()) type = "tcp";
@@ -117,7 +119,18 @@ public class VlessParser {
                       .append(", \"headers\": {\"Host\": ").append(org.json.JSONObject.quote(host)).append("}}");
             }
             if ("tls".equals(security)) {
-                config.append(",\n      \"tlsSettings\": {\"serverName\": ").append(org.json.JSONObject.quote(sni)).append("}");
+                config.append(",\n      \"tlsSettings\": {\"serverName\": ").append(org.json.JSONObject.quote(sni));
+                if (!alpn.isEmpty()) {
+                    config.append(", \"alpn\": [");
+                    String[] alpns = alpn.split(",");
+                    for (int i = 0; i < alpns.length; i++) {
+                        if (i > 0) config.append(", ");
+                        config.append(org.json.JSONObject.quote(alpns[i].trim()));
+                    }
+                    config.append("]");
+                }
+                if (!fp.isEmpty()) config.append(", \"fingerprint\": ").append(org.json.JSONObject.quote(fp));
+                config.append("}");
             }
 
             config.append("\n    }\n");
