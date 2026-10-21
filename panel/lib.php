@@ -65,10 +65,17 @@ function timing_safe(string $a, string $b): bool { return hash_equals($a, $b); }
 function hmac_for(string $message): string { return hash_hmac('sha256', $message, cfg('HANDSHAKE_KEY')); }
 function valid_time(string $ts): bool { return ctype_digit($ts) && abs(time() - (int)$ts) <= 90; }
 function ip_bound_token(string $token, string $did): ?array {
-    $q = db()->prepare('SELECT * FROM sessions WHERE token=? AND did=? AND ip_hash=? AND expires_at>=?');
-    $q->execute([$token, $did, client_ip_hash(), time()]);
+    // شبكات الجوال قد تغيّر IP بين handshake وطلب creds. يبقى التحقق الصارم على
+    // device ID والتوقيع ومدة الجلسة، مع تحديث بصمة IP داخل نفس الجلسة القصيرة.
+    $q = db()->prepare('SELECT * FROM sessions WHERE token=? AND did=? AND expires_at>=?');
+    $q->execute([$token, $did, time()]);
     $row = $q->fetch();
     if (!$row) return null;
+    $currentIp = client_ip_hash();
+    if (!hash_equals((string)$row['ip_hash'], $currentIp)) {
+        db()->prepare('UPDATE sessions SET ip_hash=? WHERE token=?')->execute([$currentIp, $token]);
+        $row['ip_hash'] = $currentIp;
+    }
     return $row;
 }
 function session_key(string $snonce): string { return hash('sha256', cfg('API_SECURE_KEY') . '|' . $snonce, true); }
