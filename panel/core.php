@@ -48,16 +48,20 @@ if ($action === 'get_max_app_data') {
     unset($row);
     $payloads = db()->query('SELECT network,subtitle,config FROM payloads WHERE active=1 ORDER BY network,id')->fetchAll();
     $serverPayloads = [];
+    $topRows = [];
     foreach ($rows as $serverRow) {
-        $serverPayloads[] = [
-            'network' => $serverRow['carrier'] !== '' ? $serverRow['carrier'] : $serverRow['country'],
-            'subtitle' => $serverRow['subtitle'] !== '' ? $serverRow['subtitle'] : $serverRow['protocol'],
-            'config' => $serverRow['config'],
-        ];
-        unset($serverRow['carrier'], $serverRow['protocol']);
+        if (str_starts_with((string)$serverRow['config'], 'SSH_PAYLOAD|')) {
+            $serverPayloads[] = [
+                'name' => $serverRow['carrier'] !== '' ? $serverRow['carrier'] : $serverRow['country'],
+                'info' => $serverRow['subtitle'] !== '' ? $serverRow['subtitle'] : $serverRow['protocol'],
+                'config' => $serverRow['config'],
+            ];
+        } else {
+            unset($serverRow['carrier'], $serverRow['protocol']);
+            $topRows[] = $serverRow;
+        }
     }
-    foreach ($rows as &$row) { unset($row['carrier'], $row['protocol']); }
-    unset($row);
+    $rows = $topRows;
     $payloads = array_merge($payloads, $serverPayloads);
     $rows = array_merge($rows, $payloads);
     json_out(['status'=>'success','data'=>encrypt_response(json_encode($rows, JSON_UNESCAPED_SLASHES), session_key($session['snonce']))]);
