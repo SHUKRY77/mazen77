@@ -48,6 +48,14 @@ function normalize_v2ray_link(string $link, string &$secret): string {
     }
     return $link;
 }
+function attach_server_sid(string $link, string $id): string {
+    if (preg_match('/([?&])_sid=[a-f0-9]{32}/i', $link)) return $link;
+    $fragment = '';
+    $hashPos = strpos($link, '#');
+    if ($hashPos !== false) { $fragment = substr($link, $hashPos); $link = substr($link, 0, $hashPos); }
+    $link .= (str_contains($link, '?') ? '&' : '?') . '_sid=' . rawurlencode($id);
+    return $link . $fragment;
+}
 $csrf = csrf_token();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     check_csrf();
@@ -66,7 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $isSshPost = str_starts_with(postv('protocol'), 'ssh') || postv('protocol') === 'dnstt';
         $secret = postv('secret');
         $public = str_replace('{ID}', $id, postv('public_config'));
-        if (!$isSshPost) $public = normalize_v2ray_link($public, $secret);
+        if (!$isSshPost) {
+            $public = normalize_v2ray_link($public, $secret);
+            $public = attach_server_sid($public, $id);
+        }
         if ($isSshPost && $public === '') $public = 'ssh://AUTH@'.postv('host').':'.(int)postv('port','22').'/?_sid='.$id;
         if ($public === '' || stripos($public, 'AUTH') === false || preg_match('/(uuid|password|passwd)=/i', $public)) exit('الرابط العام يجب أن يحتوي AUTH ولا يحتوي كلمة المرور.');
         $values = [
