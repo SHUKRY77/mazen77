@@ -42,7 +42,9 @@ function db(): PDO {
         'service_name TEXT NOT NULL DEFAULT ""',
         'reality_public_key TEXT NOT NULL DEFAULT ""',
         'reality_short_id TEXT NOT NULL DEFAULT ""',
-        'reality_dest TEXT NOT NULL DEFAULT ""'
+        'reality_dest TEXT NOT NULL DEFAULT ""',
+        'dns_nameserver TEXT NOT NULL DEFAULT ""',
+        'dns_public_key TEXT NOT NULL DEFAULT ""'
     ] as $column) {
         try { $pdo->exec('ALTER TABLE servers ADD COLUMN '.$column); } catch (Throwable $ignored) {}
     }
