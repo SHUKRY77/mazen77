@@ -63,7 +63,9 @@ public class SslConnectProxy implements Proxy {
             socket.setSoTimeout(timeout);
             Pq.p("[SSL Proxy] تم الاتصال بالبروكسي، جاري بدء مصافحة TLS...");
 
-            SSLSocketFactory sslFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            // Explicit SSH TLS-Proxy transport; the proxy may use a private
+            // or self-signed certificate and is not ordinary HTTPS/V2Ray.
+            SSLSocketFactory sslFactory = SshTlsSocketFactory.create();
             SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket(socket, proxyIp, proxyPort, true);
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

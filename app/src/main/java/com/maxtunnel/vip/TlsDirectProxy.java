@@ -22,7 +22,10 @@ public final class TlsDirectProxy implements Proxy {
     @Override public void connect(SocketFactory ignored, String host, int port, int timeout) throws Exception {
         Socket raw = new Socket();
         raw.connect(new InetSocketAddress(host, port), timeout);
-        SSLSocket ssl = (SSLSocket)((SSLSocketFactory)SSLSocketFactory.getDefault()).createSocket(raw, host, port, true);
+        // SSH-TLS servers frequently use a tunnel-only/self-signed certificate.
+        // This factory is scoped to the explicit SSH-TLS transport only.
+        SSLSocketFactory factory = SshTlsSocketFactory.create();
+        SSLSocket ssl = (SSLSocket)factory.createSocket(raw, host, port, true);
         if (sni != null && !sni.isEmpty() && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             SSLParameters p = ssl.getSSLParameters();
             p.setServerNames(Collections.singletonList(new SNIHostName(sni)));

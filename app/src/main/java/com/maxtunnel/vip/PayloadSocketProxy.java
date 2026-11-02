@@ -72,8 +72,8 @@ public final class PayloadSocketProxy implements Proxy {
     }
 
     private SSLSocket tls(Socket raw, String serverName, int port) throws Exception {
-        SSLSocket ssl = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault())
-                .createSocket(raw, serverName, port, true);
+        SSLSocketFactory factory = SshTlsSocketFactory.create();
+        SSLSocket ssl = (SSLSocket) factory.createSocket(raw, serverName, port, true);
         if (serverName != null && !serverName.isEmpty() && android.os.Build.VERSION.SDK_INT >= 24) {
             SSLParameters p = ssl.getSSLParameters();
             p.setServerNames(Collections.singletonList(new SNIHostName(serverName)));
