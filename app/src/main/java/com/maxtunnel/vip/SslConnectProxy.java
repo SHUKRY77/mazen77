@@ -1,5 +1,6 @@
 package com.maxtunnel.vip;
 
+import android.util.Base64;
 import com.jcraft.jsch.Proxy;
 import com.jcraft.jsch.SocketFactory;
 
@@ -7,6 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Collections;
 
 import javax.net.ssl.SNIHostName;
@@ -15,23 +18,15 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
- * نوع اتصال "SSL Proxy": يفتح نفق TLS مع بروكسي وسيط (Squid / 3proxy / Nginx stream...)
- * ثم يرسل طلب HTTP CONNECT القياسي للوصول لسيرفر SSH الحقيقي خلف البروكسي.
- *
- * يختلف عن CloudflareWsProxy (SSL + Payload) في أن هذا النوع لا يحتاج تمويه WebSocket
- * أو حقن رؤوس مخصصة — فقط طلب CONNECT عادي كما تفعله المتصفحات مع أي بروكسي HTTPS قياسي.
- *
- * تنسيق القراءة من الحقل ssh_host: يدعم "host" فقط (ويُفترض المنفذ 22 افتراضياً)
- * أو "host:port" صراحة لو منفذ SSH الحقيقي خلف البروكسي مختلف عن 22.
+ * SSH TLS + Proxy transport. It supports a normal TLS-wrapped CONNECT proxy
+ * and a Cloudflare HTTP upgrade endpoint, which rejects CONNECT with 400.
  */
 public class SslConnectProxy implements Proxy {
-
     private final String proxyIp;
     private final int proxyPort;
     private final String sni;
     private final String targetHost;
     private final int targetPort;
-
     private InputStream in;
     private OutputStream out;
     private Socket socket;
@@ -39,95 +34,118 @@ public class SslConnectProxy implements Proxy {
     public SslConnectProxy(String proxyIp, int proxyPort, String sni, String sshHostField) {
         this.proxyIp = proxyIp;
         this.proxyPort = proxyPort;
-        this.sni = sni;
-
-        String host = sshHostField;
+        this.sni = sni == null ? "" : sni;
+        String host = sshHostField == null ? "" : sshHostField;
         int port = 22;
-        if (sshHostField != null && sshHostField.contains(":")) {
-            String[] hp = sshHostField.split(":");
-            host = hp[0];
-            try {
-                port = Integer.parseInt(hp[1]);
-            } catch (Exception ignored) {}
+        int colon = host.lastIndexOf(':');
+        if (colon > 0 && colon < host.length() - 1) {
+            try { port = Integer.parseInt(host.substring(colon + 1)); host = host.substring(0, colon); }
+            catch (Exception ignored) {}
         }
         this.targetHost = host;
         this.targetPort = port;
     }
 
-    @Override
-    public void connect(SocketFactory socketFactory, String host, int port, int timeout) throws Exception {
+    @Override public void connect(SocketFactory ignored, String host, int port, int timeout) throws Exception {
         Pq.p("[SSL Proxy] جاري الاتصال بالبروكسي...");
         try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(proxyIp, proxyPort), timeout);
-            socket.setSoTimeout(timeout);
-            Pq.p("[SSL Proxy] تم الاتصال بالبروكسي، جاري بدء مصافحة TLS...");
-
-            // Explicit SSH TLS-Proxy transport; the proxy may use a private
-            // or self-signed certificate and is not ordinary HTTPS/V2Ray.
-            SSLSocketFactory sslFactory = SshTlsSocketFactory.create();
-            SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket(socket, proxyIp, proxyPort, true);
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                SSLParameters sslParameters = sslSocket.getSSLParameters();
-                sslParameters.setServerNames(Collections.singletonList(new SNIHostName(sni)));
-                sslSocket.setSSLParameters(sslParameters);
-            }
-            sslSocket.startHandshake();
+            openTls(timeout);
             Pq.p("[SSL Proxy] اكتملت مصافحة TLS بنجاح.");
-
-            in = sslSocket.getInputStream();
-            out = sslSocket.getOutputStream();
-
-            String connectRequest = "CONNECT " + targetHost + ":" + targetPort + " HTTP/1.1\r\n"
-                    + "Host: " + targetHost + ":" + targetPort + "\r\n"
-                    + "Proxy-Connection: Keep-Alive\r\n"
-                    + "Connection: Keep-Alive\r\n"
-                    + "User-Agent: Dalvik/2.1.0 (Linux; U; Android 11)\r\n"
-                    + "\r\n";
-
-            Pq.p("[SSL Proxy] إرسال طلب CONNECT إلى " + targetHost + ":" + targetPort);
-            out.write(connectRequest.getBytes("UTF-8"));
-            out.flush();
-
-            // قراءة رؤوس الاستجابة حرفاً بحرف (بدون BufferedReader) حتى لا نسحب
-            // بالخطأ أي بايتات تخص بروتوكول SSH القادمة بعد نهاية الرؤوس
-            StringBuilder response = new StringBuilder();
-            int c;
-            while ((c = in.read()) >= 0) {
-                response.append((char) c);
-                if (response.toString().endsWith("\r\n\r\n")) {
-                    break;
+            String response = sendConnectAndRead(timeout);
+            if (isSuccess(response)) {
+                Pq.p("[SSL Proxy] تم إنشاء النفق بنجاح عبر CONNECT.");
+                return;
+            }
+            // Cloudflare's HTTP edge does not implement CONNECT. Reconnect and
+            // use an HTTP upgrade request instead; the old TLS socket is closed.
+            if (looksLikeCloudflare(response)) {
+                Pq.p("[SSL Proxy] Cloudflare رفض CONNECT؛ تجربة HTTP Upgrade...");
+                closeSocket();
+                openTls(timeout);
+                String upgrade = sendCloudflareUpgradeAndRead();
+                if (upgrade.contains(" 101 ") || upgrade.contains(" 200 ")) {
+                    Pq.p("[SSL Proxy] تم إنشاء النفق عبر HTTP Upgrade.");
+                    return;
                 }
+                throw new Exception("فشل HTTP Upgrade عبر SSL Proxy. الاستجابة: " + upgrade.trim());
             }
-
-            String responseStr = response.toString();
-            boolean isTunnelOpen = responseStr.contains(" 200 ") || responseStr.contains("200 Connection established");
-
-            if (!isTunnelOpen) {
-                throw new Exception("فشل طلب CONNECT عبر SSL Proxy. الاستجابة: " + responseStr.trim());
-            }
-
-            Pq.p("[SSL Proxy] تم إنشاء النفق بنجاح عبر البروكسي.");
+            throw new Exception("فشل طلب CONNECT عبر SSL Proxy. الاستجابة: " + response.trim());
         } catch (Exception e) {
             Pq.p("[SSL Proxy] خطأ: " + e.getMessage());
+            closeSocket();
             throw e;
         }
     }
 
-    @Override
-    public InputStream getInputStream() { return in; }
-
-    @Override
-    public OutputStream getOutputStream() { return out; }
-
-    @Override
-    public Socket getSocket() { return socket; }
-
-    @Override
-    public void close() {
-        try { if (in != null) in.close(); } catch (Exception e) {}
-        try { if (out != null) out.close(); } catch (Exception e) {}
-        try { if (socket != null) socket.close(); } catch (Exception e) {}
+    private void openTls(int timeout) throws Exception {
+        Socket raw = new Socket();
+        raw.connect(new InetSocketAddress(proxyIp, proxyPort), timeout);
+        raw.setSoTimeout(timeout);
+        Pq.p("[SSL Proxy] تم الاتصال بالبروكسي، جاري بدء مصافحة TLS...");
+        SSLSocket ssl = (SSLSocket) SshTlsSocketFactory.create().createSocket(raw, proxyIp, proxyPort, true);
+        if (!sni.isEmpty() && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            SSLParameters p = ssl.getSSLParameters();
+            p.setServerNames(Collections.singletonList(new SNIHostName(sni)));
+            ssl.setSSLParameters(p);
+        }
+        ssl.startHandshake();
+        socket = ssl;
+        in = ssl.getInputStream();
+        out = ssl.getOutputStream();
     }
+
+    private String sendConnectAndRead(int timeout) throws Exception {
+        String request = "CONNECT " + targetHost + ":" + targetPort + " HTTP/1.1\r\n"
+                + "Host: " + targetHost + ":" + targetPort + "\r\n"
+                + "Proxy-Connection: Keep-Alive\r\nConnection: Keep-Alive\r\n"
+                + "User-Agent: Dalvik/2.1.0 (Linux; U; Android 11)\r\n\r\n";
+        Pq.p("[SSL Proxy] إرسال طلب CONNECT إلى " + targetHost + ":" + targetPort);
+        out.write(request.getBytes(StandardCharsets.UTF_8)); out.flush();
+        return readHeaders();
+    }
+
+    private String sendCloudflareUpgradeAndRead() throws Exception {
+        byte[] nonce = new byte[16];
+        new SecureRandom().nextBytes(nonce);
+        String key = Base64.encodeToString(nonce, Base64.NO_WRAP);
+        String hostHeader = sni.isEmpty() ? targetHost : sni;
+        String request = "GET / HTTP/1.1\r\nHost: " + hostHeader + "\r\n"
+                + "Upgrade: websocket\r\nConnection: Upgrade\r\n"
+                + "Sec-WebSocket-Key: " + key + "\r\nSec-WebSocket-Version: 13\r\n"
+                + "User-Agent: Dalvik/2.1.0 (Linux; Android 11)\r\n\r\n";
+        out.write(request.getBytes(StandardCharsets.UTF_8)); out.flush();
+        return readHeaders();
+    }
+
+    private String readHeaders() throws Exception {
+        StringBuilder response = new StringBuilder();
+        int c;
+        while ((c = in.read()) >= 0) {
+            response.append((char) c);
+            if (response.length() > 16384 || response.toString().endsWith("\r\n\r\n")) break;
+        }
+        return response.toString();
+    }
+
+    private boolean isSuccess(String response) {
+        return response.contains(" 200 ") || response.contains("200 Connection established");
+    }
+
+    private boolean looksLikeCloudflare(String response) {
+        String lower = response.toLowerCase();
+        return lower.contains("server: cloudflare") || lower.contains(" 400 bad request")
+                || lower.contains(" 405 method not allowed");
+    }
+
+    private void closeSocket() {
+        try { if (in != null) in.close(); } catch (Exception ignored) {}
+        try { if (out != null) out.close(); } catch (Exception ignored) {}
+        try { if (socket != null) socket.close(); } catch (Exception ignored) {}
+        in = null; out = null; socket = null;
+    }
+
+    @Override public InputStream getInputStream() { return in; }
+    @Override public OutputStream getOutputStream() { return out; }
+    @Override public Socket getSocket() { return socket; }
+    @Override public void close() { closeSocket(); }
 }
