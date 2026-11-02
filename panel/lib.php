@@ -27,8 +27,10 @@ function db(): PDO {
     $pdo->exec('PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;');
     $pdo->exec('CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, did TEXT NOT NULL, ip_hash TEXT NOT NULL, snonce TEXT NOT NULL, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)');
     try { $pdo->exec('ALTER TABLE sessions ADD COLUMN snonce TEXT NOT NULL DEFAULT ""'); } catch (Throwable $ignored) {}
+    try { $pdo->exec('ALTER TABLE sessions ADD COLUMN device_pub TEXT NOT NULL DEFAULT ""'); } catch (Throwable $ignored) {}
     $pdo->exec('CREATE TABLE IF NOT EXISTS servers (id TEXT PRIMARY KEY, country TEXT NOT NULL, subtitle TEXT NOT NULL, protocol TEXT NOT NULL, host TEXT NOT NULL, port INTEGER NOT NULL, sni TEXT NOT NULL DEFAULT \'\', network TEXT NOT NULL DEFAULT \'tcp\', path TEXT NOT NULL DEFAULT \'/\', secret_enc TEXT NOT NULL DEFAULT \'\', ssh_user_enc TEXT NOT NULL DEFAULT \'\', ssh_pass_enc TEXT NOT NULL DEFAULT \'\', public_config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT, event TEXT NOT NULL, ip_hash TEXT NOT NULL, created_at INTEGER NOT NULL)');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS request_nonces (token TEXT NOT NULL, nonce TEXT NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(token,nonce))');
     $pdo->exec('CREATE TABLE IF NOT EXISTS payloads (id TEXT PRIMARY KEY, network TEXT NOT NULL, subtitle TEXT NOT NULL, config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
     foreach ([
         'target_app TEXT NOT NULL DEFAULT "Max Tunnel"',
@@ -79,6 +81,21 @@ function ip_bound_token(string $token, string $did): ?array {
         $row['ip_hash'] = $currentIp;
     }
     return $row;
+}
+
+function consume_request_nonce(string $token, string $nonce): bool {
+    if (!preg_match('/^[a-f0-9]{32}$/', $nonce)) return false;
+    $pdo = db(); $pdo->prepare('DELETE FROM request_nonces WHERE expires_at<?')->execute([time()]);
+    try { $pdo->prepare('INSERT INTO request_nonces(token,nonce,expires_at) VALUES(?,?,?)')->execute([$token,$nonce,time()+180]); return true; }
+    catch (Throwable $e) { return false; }
+}
+function verify_device_proof(string $publicKeyB64, string $proofB64, string $message): bool {
+    if ($publicKeyB64 === '' || $proofB64 === '' || strlen($publicKeyB64) > 4096 || strlen($proofB64) > 1024) return false;
+    $der = base64_decode($publicKeyB64, true); $sig = base64_decode($proofB64, true);
+    if ($der === false || $sig === false) return false;
+    $pem = "-----BEGIN PUBLIC KEY-----\n" . chunk_split(base64_encode($der), 64, "\n") . "-----END PUBLIC KEY-----\n";
+    $key = openssl_pkey_get_public($pem);
+    return $key !== false && openssl_verify($message, $sig, $key, OPENSSL_ALGO_SHA256) === 1;
 }
 function session_key(string $snonce): string { return hash('sha256', cfg('API_SECURE_KEY') . '|' . $snonce, true); }
 function encrypt_response(string $plaintext, string $key): string {

@@ -25,10 +25,20 @@ public class Pq {
 
     // 🌟 هذه هي الدالة السحرية التي يستخدمها التطبيق الأصلي لطباعة السجلات
     public static void p(String message) {
+        message = redact(message);
         for (LogListener listener : listeners) {
             if (listener != null) {
                 listener.onNewLog(message);
             }
         }
+    }
+
+    /** Keep server names and addresses out of the user-visible diagnostic console. */
+    public static String redact(String message) {
+        if (message == null) return "حدث خطأ غير معروف";
+        String safe = message;
+        safe = safe.replaceAll("(?i)(?<![A-Za-z0-9_-])(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)+[A-Za-z]{2,}(?![A-Za-z0-9_-])", "[hidden-host]");
+        safe = safe.replaceAll("(?<![0-9])(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?![0-9])", "[hidden-address]");
+        return safe;
     }
 }

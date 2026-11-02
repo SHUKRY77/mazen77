@@ -12,8 +12,14 @@ android {
         versionName = "1.0"
     }
     buildTypes {
+        debug {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = false
+        }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }

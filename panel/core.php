@@ -6,23 +6,27 @@ $action = (string)($_GET['action'] ?? '');
 $did = trim((string)($_GET['did'] ?? ''));
 $ts = (string)($_GET['ts'] ?? '');
 $sig = strtolower((string)($_GET['sig'] ?? ''));
+$devicePub = (string)($_GET['pk'] ?? '');
+$deviceProof = (string)($_GET['dp'] ?? '');
+$deviceNonce = (string)($_GET['dn'] ?? '');
 if ($did === '' || strlen($did) > 160 || !valid_time($ts)) json_out(['status'=>'error','message'=>'Invalid request'], 400);
 
 if ($action === 'hs') {
     $nonce = strtolower((string)($_GET['n'] ?? ''));
-    if (!preg_match('/^[a-f0-9]{32}$/', $nonce) || !timing_safe(hmac_for($did.'|'.$ts.'|'.$nonce), $sig)) json_out(['status'=>'error','message'=>'Handshake rejected'], 403);
+    if (!preg_match('/^[a-f0-9]{32}$/', $nonce) || !timing_safe(hmac_for($did.'|'.$ts.'|'.$nonce), $sig) || !verify_device_proof($devicePub, $deviceProof, $did.'||'.$ts.'|hs||'.$nonce)) json_out(['status'=>'error','message'=>'Handshake rejected'], 403);
     $token = random_hex(32); $snonce = random_hex(32); $now = time();
     db()->prepare('DELETE FROM sessions WHERE expires_at<?')->execute([$now]);
-    db()->prepare('INSERT INTO sessions(token,did,ip_hash,snonce,expires_at,created_at) VALUES(?,?,?,?,?,?)')->execute([$token,$did,client_ip_hash(),$snonce,$now+300,$now]);
+    db()->prepare('INSERT INTO sessions(token,did,ip_hash,snonce,device_pub,expires_at,created_at) VALUES(?,?,?,?,?,?,?)')->execute([$token,$did,client_ip_hash(),$snonce,$devicePub,$now+180,$now]);
     audit('handshake');
-    json_out(['status'=>'ok','token'=>$token,'snonce'=>$snonce,'expires_in'=>300]);
+    json_out(['status'=>'ok','token'=>$token,'snonce'=>$snonce,'expires_in'=>180]);
 }
 
 $token = (string)($_GET['token'] ?? '');
 $session = ip_bound_token($token, $did);
 if (!$session) json_out(['status'=>'error','message'=>'Session expired'], 401);
+if ($devicePub !== '' && !hash_equals((string)$session['device_pub'], $devicePub)) json_out(['status'=>'error','message'=>'Device binding rejected'], 403);
 if ($action === 'get_max_app_data') {
-    if (!timing_safe(hmac_for($did.'|'.$token.'|'.$ts), $sig)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
+    if (!timing_safe(hmac_for($did.'|'.$token.'|'.$ts), $sig) || !consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|get_max_app_data||'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
     $rows = db()->query('SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config FROM servers WHERE active=1 ORDER BY country,id')->fetchAll();
     foreach ($rows as &$row) {
         if (str_starts_with((string)$row['protocol'], 'ssh') || $row['protocol'] === 'dnstt') {
@@ -78,7 +82,7 @@ if ($action === 'get_max_app_data') {
 }
 if ($action === 'creds') {
     $sid = trim((string)($_GET['sid'] ?? ''));
-    if (!preg_match('/^[a-f0-9]{32}$/', $sid) || !timing_safe(hmac_for($did.'|'.$token.'|'.$ts.'|'.$sid), $sig)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
+    if (!preg_match('/^[a-f0-9]{32}$/', $sid) || !timing_safe(hmac_for($did.'|'.$token.'|'.$ts.'|'.$sid), $sig) || !consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|creds|'.$sid.'|'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
     $q = db()->prepare('SELECT * FROM servers WHERE id=? AND active=1'); $q->execute([$sid]); $server=$q->fetch();
     if (!$server) json_out(['status'=>'error','message'=>'Server unavailable'], 404);
     $secret = master_decrypt($server['secret_enc']); $user = master_decrypt($server['ssh_user_enc']); $pass = master_decrypt($server['ssh_pass_enc']);

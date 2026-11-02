@@ -18,13 +18,13 @@
 
     <application 
         android:name=".KINGVpnApp" 
-        android:allowBackup="true" 
+        android:allowBackup="false"
         android:icon="@drawable/app_logo" 
         android:roundIcon="@drawable/app_logo" 
         android:label="@string/app_name" 
         android:supportsRtl="false" 
         android:theme="@style/AppTheme" 
-        android:usesCleartextTraffic="true"> 
+        android:usesCleartextTraffic="false">
         
         <!-- معرف التطبيق الحقيقي الخاص بك في AdMob (تم الحفاظ عليه كما هو) -->
         <meta-data

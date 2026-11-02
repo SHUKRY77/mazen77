@@ -110,7 +110,7 @@ public class SshVpnService extends VpnService {
     private void sendStateToUI(String state, String message) {
         Intent intent = new Intent("MAX_TUNNEL_STATE");
         intent.putExtra("state", state);
-        intent.putExtra("msg", message);
+        intent.putExtra("msg", Pq.redact(message));
         intent.setPackage(getPackageName());
         sendBroadcast(intent);
     }
