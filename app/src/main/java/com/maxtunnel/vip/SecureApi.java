@@ -62,8 +62,8 @@ public class SecureApi {
 
     private static String httpGet(String url) throws Exception {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection(java.net.Proxy.NO_PROXY);
-        connection.setConnectTimeout(15000);
-        connection.setReadTimeout(15000);
+        connection.setConnectTimeout(30000);
+        connection.setReadTimeout(30000);
         connection.setRequestMethod("GET");
         connection.setRequestProperty("User-Agent", "MaxTunnel/1.0");
         connection.setRequestProperty("Cache-Control", "no-store");

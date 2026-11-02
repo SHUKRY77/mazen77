@@ -5,6 +5,7 @@ android {
     compileSdk = 35
     defaultConfig {
         applicationId = "com.maxtunnel.vip"
+        ndk { abiFilters += listOf("arm64-v8a") }
         minSdk = 23
         targetSdk = 35
         versionCode = 1
