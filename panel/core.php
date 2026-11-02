@@ -29,10 +29,14 @@ if ($action === 'get_max_app_data') {
             $type = match ($row['protocol']) {
                 'ssh' => 'direct',
                 'ssh-proxy' => 'http_proxy',
+                'ssh-payload' => 'payload',
+                'ssh-proxy-payload' => 'http_payload',
                 'ssh-tls' => 'tls_direct',
                 'ssh-tls-proxy' => 'ssl_proxy',
+                'ssh-tls-payload' => 'tls_payload',
+                'ssh-tls-proxy-payload' => 'tls_proxy_payload',
                 'dnstt' => 'slowdns',
-                default => 'ssl_payload',
+                default => 'payload',
             };
             $proxyHost = '';
             $proxyPort = '80';

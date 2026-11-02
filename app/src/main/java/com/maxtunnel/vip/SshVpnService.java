@@ -33,7 +33,11 @@ public class SshVpnService extends VpnService {
     public static final String ACTION_START_SSH = "app.fixbuild.vpncore.assag.START_SSH";
     public static final String ACTION_STOP_SSH = "app.fixbuild.vpncore.assag.STOP_SSH";
 
-    private static final String CONN_TYPE_SSL_PAYLOAD = "ssl_payload"; 
+    private static final String CONN_TYPE_SSL_PAYLOAD = "ssl_payload";
+    private static final String CONN_TYPE_PAYLOAD = "payload";
+    private static final String CONN_TYPE_HTTP_PAYLOAD = "http_payload";
+    private static final String CONN_TYPE_TLS_PAYLOAD = "tls_payload";
+    private static final String CONN_TYPE_TLS_PROXY_PAYLOAD = "tls_proxy_payload";
     private static final String CONN_TYPE_SSL_PROXY   = "ssl_proxy";   
     private static final String CONN_TYPE_DIRECT      = "direct";      
     private static final String CONN_TYPE_UDP         = "udp";         
@@ -152,7 +156,7 @@ public class SshVpnService extends VpnService {
                 }
 
                 String sshHostOnly = sshHostField.contains(":") ? sshHostField.split(":")[0] : sshHostField;
-                int sshPort = 443;
+                int sshPort = (connType.contains("tls") || connType.equals("ssl_proxy") || connType.equals("ssl_payload")) ? 443 : 22;
                 if (sshHostField.contains(":")) {
                     try {
                         sshPort = Integer.parseInt(sshHostField.split(":")[1]);
@@ -168,20 +172,32 @@ public class SshVpnService extends VpnService {
 
                 // تم تفعيل Direct SSH و SSH UDP للعمل مباشرة وبأقل زمن تأخير
                 if (connType.equals(CONN_TYPE_DIRECT)) {
-                    Pq.p("وضع الاتصال: Direct SSH (تم تفعيله بنجاح ✔️)");
+                    Pq.p("وضع الاتصال: SSH Direct");
                 } else if (connType.equals(CONN_TYPE_UDP)) {
-                    Pq.p("وضع الاتصال: SSH UDP / BadVPN (تم تفعيله بنجاح ✔️)");
+                    Pq.p("وضع الاتصال: SSH UDP / BadVPN");
+                } else if (connType.equals(CONN_TYPE_PAYLOAD)) {
+                    Pq.p("وضع الاتصال: SSH Payload");
+                    sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.DIRECT, "", 0, sni, customPayload, sshHostOnly, sshPort));
                 } else if (connType.equals("http_proxy")) {
                     Pq.p("وضع الاتصال: SSH Proxy (HTTP CONNECT)");
                     sshSession.setProxy(new HttpConnectProxy(squidIp, squidPort, sshHostField));
+                } else if (connType.equals(CONN_TYPE_HTTP_PAYLOAD)) {
+                    Pq.p("وضع الاتصال: SSH Proxy + Payload");
+                    sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.HTTP_CONNECT, squidIp, squidPort, sni, customPayload, sshHostOnly, sshPort));
                 } else if (connType.equals("tls_direct")) {
-                    Pq.p("وضع الاتصال: SSH TLS مباشر");
+                    Pq.p("وضع الاتصال: SSH TLS");
                     sshSession.setProxy(new TlsDirectProxy(sni));
+                } else if (connType.equals(CONN_TYPE_TLS_PAYLOAD)) {
+                    Pq.p("وضع الاتصال: SSH TLS + Payload");
+                    sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.TLS_DIRECT, "", 0, sni, customPayload, sshHostOnly, sshPort));
                 } else if (connType.equals(CONN_TYPE_SSL_PROXY)) {
-                    Pq.p("وضع الاتصال: SSL Proxy (تم تفعيله بنجاح ✔️️)");
+                    Pq.p("وضع الاتصال: SSH TLS + Proxy");
                     sshSession.setProxy(new SslConnectProxy(squidIp, squidPort, sni, sshHostField));
+                } else if (connType.equals(CONN_TYPE_TLS_PROXY_PAYLOAD)) {
+                    Pq.p("وضع الاتصال: SSH TLS + Proxy + Payload");
+                    sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.TLS_PROXY, squidIp, squidPort, sni, customPayload, sshHostOnly, sshPort));
                 } else {
-                    Pq.p("وضع الاتصال: SSL + Payload (تم تفعيله بنجاح ✔️)");
+                    Pq.p("وضع الاتصال: SSH TLS + Payload");
                     sshSession.setProxy(new CloudflareWsProxy(squidIp, squidPort, sni, customPayload, sshHostOnly));
                 }
 
