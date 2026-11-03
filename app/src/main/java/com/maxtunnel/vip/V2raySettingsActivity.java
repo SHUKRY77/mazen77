@@ -14,29 +14,29 @@ public class V2raySettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         // ربط الواجهة التي قمنا بإنشائها للتو
-        setContentView(R.layout.activity_v2ray_settings); 
+        setContentView(R.layout.activity_v2ray_settings);
 
         // إعداد الشريط العلوي (Toolbar)
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         if (toolbar != null) {
             toolbar.setTitle("Max Tunnel");
             toolbar.setSubtitle("V2Ray Settings");
-            
+
             // ضبط ألوان الشريط العلوي
-            toolbar.setBackgroundColor(Color.parseColor("#00E676")); 
+            toolbar.setBackgroundColor(Color.parseColor("#009688"));
             toolbar.setTitleTextColor(Color.WHITE);
             toolbar.setSubtitleTextColor(Color.WHITE);
-            
+
             setSupportActionBar(toolbar);
-            
+
             // إظهار زر الرجوع
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
             }
-            
+
             // برمجة زر الرجوع ليغلق الشاشة
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
@@ -45,7 +45,7 @@ public class V2raySettingsActivity extends AppCompatActivity {
                 }
             });
         }
-        
+
         // هنا سيتم استدعاء عناصر الإعدادات (المفاتيح والخيارات) لاحقاً
     }
 

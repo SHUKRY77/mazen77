@@ -17,7 +17,7 @@
             android:id="@+id/dialog_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#D32F2F"
+            android:background="#009688"
             android:padding="16dp"
             android:text="Choose your favorite color"
             android:textColor="@android:color/white"
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20dp"
-                android:buttonTint="#D32F2F"
+                android:buttonTint="#009688"
                 android:checked="true"
                 android:text="Light mod"
                 android:textColor="#333333" />
@@ -44,7 +44,7 @@
                 android:id="@+id/rb_dark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:buttonTint="#D32F2F"
+                android:buttonTint="#009688"
                 android:text="Dark mod"
                 android:textColor="#333333" />
         </RadioGroup>
@@ -63,9 +63,9 @@
             <androidx.cardview.widget.CardView android:id="@+id/color_4" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#673AB7" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
 
             <androidx.cardview.widget.CardView android:id="@+id/color_5" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#3F51B5" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
-            <androidx.cardview.widget.CardView android:id="@+id/color_6" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#2196F3" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
-            <androidx.cardview.widget.CardView android:id="@+id/color_7" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#03A9F4" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
-            <androidx.cardview.widget.CardView android:id="@+id/color_8" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#00BCD4" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
+            <androidx.cardview.widget.CardView android:id="@+id/color_6" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#009688" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
+            <androidx.cardview.widget.CardView android:id="@+id/color_7" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#009688" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
+            <androidx.cardview.widget.CardView android:id="@+id/color_8" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#009688" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
 
             <androidx.cardview.widget.CardView android:id="@+id/color_9" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#009688" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
             <androidx.cardview.widget.CardView android:id="@+id/color_10" android:clickable="true" android:focusable="true" android:foreground="?attr/selectableItemBackground" android:layout_width="40dp" android:layout_height="40dp" android:layout_margin="8dp" app:cardBackgroundColor="#4CAF50" app:cardCornerRadius="20dp" app:cardElevation="0dp"/>
@@ -96,7 +96,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
                 android:text="Back"
-                android:textColor="#D32F2F"
+                android:textColor="#009688"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -106,7 +106,7 @@
                 android:layout_height="50dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:backgroundTint="#D32F2F"
+                android:backgroundTint="#009688"
                 android:text="Apply"
                 android:textColor="@android:color/white"
                 app:cornerRadius="25dp" />

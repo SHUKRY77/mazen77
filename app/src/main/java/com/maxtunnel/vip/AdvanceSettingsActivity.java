@@ -46,10 +46,10 @@ public class AdvanceSettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         // ربط الواجهة
         setContentView(R.layout.activity_advance_settings); // سننشئ هذا الملف لاحقاً
-        
+
         sharedPreferences = getSharedPreferences("vpn_settings", Context.MODE_PRIVATE);
 
         // إعداد الشريط العلوي (Toolbar)
@@ -57,17 +57,17 @@ public class AdvanceSettingsActivity extends AppCompatActivity {
         if (toolbar != null) {
             toolbar.setTitle("Max Tunnel");
             toolbar.setSubtitle("Advance Settings");
-            toolbar.setBackgroundColor(Color.parseColor("#00E676")); 
+            toolbar.setBackgroundColor(Color.parseColor("#009688"));
             toolbar.setTitleTextColor(Color.WHITE);
             toolbar.setSubtitleTextColor(Color.WHITE);
-            
+
             setSupportActionBar(toolbar);
-            
+
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
             }
-            
+
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

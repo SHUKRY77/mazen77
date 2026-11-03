@@ -28,6 +28,7 @@ function db(): PDO {
     $pdo->exec('CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, did TEXT NOT NULL, ip_hash TEXT NOT NULL, snonce TEXT NOT NULL, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)');
     try { $pdo->exec('ALTER TABLE sessions ADD COLUMN snonce TEXT NOT NULL DEFAULT ""'); } catch (Throwable $ignored) {}
     try { $pdo->exec('ALTER TABLE sessions ADD COLUMN device_pub TEXT NOT NULL DEFAULT ""'); } catch (Throwable $ignored) {}
+    try { $pdo->exec('ALTER TABLE sessions ADD COLUMN session_key_enc TEXT NOT NULL DEFAULT ""'); } catch (Throwable $ignored) {}
     $pdo->exec('CREATE TABLE IF NOT EXISTS servers (id TEXT PRIMARY KEY, country TEXT NOT NULL, subtitle TEXT NOT NULL, protocol TEXT NOT NULL, host TEXT NOT NULL, port INTEGER NOT NULL, sni TEXT NOT NULL DEFAULT \'\', network TEXT NOT NULL DEFAULT \'tcp\', path TEXT NOT NULL DEFAULT \'/\', secret_enc TEXT NOT NULL DEFAULT \'\', ssh_user_enc TEXT NOT NULL DEFAULT \'\', ssh_pass_enc TEXT NOT NULL DEFAULT \'\', public_config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT, event TEXT NOT NULL, ip_hash TEXT NOT NULL, created_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS request_nonces (token TEXT NOT NULL, nonce TEXT NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(token,nonce))');
@@ -89,6 +90,13 @@ function consume_request_nonce(string $token, string $nonce): bool {
     try { $pdo->prepare('INSERT INTO request_nonces(token,nonce,expires_at) VALUES(?,?,?)')->execute([$token,$nonce,time()+180]); return true; }
     catch (Throwable $e) { return false; }
 }
+
+function server_sign(string $message): string {
+    $keyFile = __DIR__ . '/data/server-signing.key';
+    $key = is_file($keyFile) ? openssl_pkey_get_private(file_get_contents($keyFile)) : false;
+    if ($key === false || !openssl_sign($message, $signature, $key, OPENSSL_ALGO_SHA256)) throw new RuntimeException('Signing failed');
+    return base64_encode($signature);
+}
 function verify_device_proof(string $publicKeyB64, string $proofB64, string $message): bool {
     if ($publicKeyB64 === '' || $proofB64 === '' || strlen($publicKeyB64) > 4096 || strlen($proofB64) > 1024) return false;
     $der = base64_decode($publicKeyB64, true); $sig = base64_decode($proofB64, true);
@@ -97,7 +105,7 @@ function verify_device_proof(string $publicKeyB64, string $proofB64, string $mes
     $key = openssl_pkey_get_public($pem);
     return $key !== false && openssl_verify($message, $sig, $key, OPENSSL_ALGO_SHA256) === 1;
 }
-function session_key(string $snonce): string { return hash('sha256', cfg('API_SECURE_KEY') . '|' . $snonce, true); }
+function session_key(array $session): string { $key = master_decrypt((string)($session['session_key_enc'] ?? '')); if ($key === '') throw new RuntimeException('Session key unavailable'); return $key; }
 function encrypt_response(string $plaintext, string $key): string {
     $iv = random_bytes(12); $tag = '';
     $ciphertext = openssl_encrypt($plaintext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag, '', 16);
