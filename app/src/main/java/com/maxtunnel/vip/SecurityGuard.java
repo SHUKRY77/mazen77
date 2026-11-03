@@ -22,7 +22,7 @@ public class SecurityGuard {
     // ثم انسخ قيمة SHA256 واحذف النقطتين (:) واجعلها أحرفاً صغيرة.
     // اتركها فارغة "" أثناء التطوير (يسمح بأي توقيع) ثم املأها قبل النشر.
     // ========================================================
-    private static final String EXPECTED_SIG_SHA256 = "4d5693265a57cad5a58c2fa4cfff429ac8a9e690e9b6b3f91a76ba197155ba1c";
+    private static final String EXPECTED_SIG_SHA256 = "e51aad6110920a864893f97cde2b5048f99d9ce7ee266bac9f5fdd6303149845";
 
     // يرجّع بصمة SHA-256 لشهادة توقيع التطبيق الحالي (hex صغير)
     public static String getAppSignatureSha256(Context ctx) {
@@ -50,8 +50,7 @@ public class SecurityGuard {
 
     // true إذا كان التوقيع صحيحاً (أو لم تُضبط البصمة بعد أثناء التطوير)
     public static boolean isSignatureValid(Context ctx) {
-        // APKs التي تُبنى للاختبار عبر GitHub Actions تكون موقعة بمفتاح Debug.
-        // لا نرفضها برسالة "نسخة غير رسمية"؛ فحص التوقيع يبقى مفعلًا في Release.
+        // نسخة GitHub الاختبارية تكون Debug-signed؛ فحص التوقيع يبقى مفعلًا في Release.
         if ((ctx.getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) return true;
         if (EXPECTED_SIG_SHA256 == null || EXPECTED_SIG_SHA256.isEmpty()) return true; // وضع التطوير
         String actual = getAppSignatureSha256(ctx);

@@ -11,15 +11,27 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+    signingConfigs {
+        create("official") {
+            val ks = System.getenv("MAXTUNNEL_KEYSTORE_FILE")
+            if (!ks.isNullOrBlank()) {
+                storeFile = file(ks)
+                storePassword = System.getenv("MAXTUNNEL_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("MAXTUNNEL_KEY_ALIAS")
+                keyPassword = System.getenv("MAXTUNNEL_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         debug {
             isMinifyEnabled = true
             isShrinkResources = true
-            isDebuggable = false
+            isDebuggable = true
         }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            if (!System.getenv("MAXTUNNEL_KEYSTORE_FILE").isNullOrBlank()) signingConfig = signingConfigs.getByName("official")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
