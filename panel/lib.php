@@ -67,7 +67,6 @@ function json_out(array $data, int $status = 200): never { http_response_code($s
 function require_post(): void { if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') json_out(['status'=>'error','message'=>'POST required'], 405); }
 function random_hex(int $bytes = 32): string { return bin2hex(random_bytes($bytes)); }
 function timing_safe(string $a, string $b): bool { return hash_equals($a, $b); }
-function hmac_for(string $message): string { return hash_hmac('sha256', $message, cfg('HANDSHAKE_KEY')); }
 function valid_time(string $ts): bool { return ctype_digit($ts) && abs(time() - (int)$ts) <= 90; }
 function ip_bound_token(string $token, string $did): ?array {
     // شبكات الجوال قد تغيّر IP بين handshake وطلب creds. يبقى التحقق الصارم على

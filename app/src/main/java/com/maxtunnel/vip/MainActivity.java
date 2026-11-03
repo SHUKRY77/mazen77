@@ -685,12 +685,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         GradientDrawable shape = new GradientDrawable();
         shape.setCornerRadius(30f);
         shape.setColor(Color.parseColor("#E3F2FD")); 
-        shape.setStroke(3, Color.parseColor("#2196F3"));
+        shape.setStroke(3, Color.parseColor("#009688"));
         layout.setBackground(shape);
         
         TextView title = new TextView(this);
         title.setText("Servers Updated Successfully!");
-        title.setTextColor(Color.parseColor("#2196F3"));
+        title.setTextColor(Color.parseColor("#009688"));
         title.setTextSize(16f);
         title.setTypeface(null, android.graphics.Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
@@ -1551,11 +1551,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (isServer) {
                 boolean isAuto = data.name.toLowerCase().contains("auto");
                 holder.subtitleText.setText(data.subtitle);
-                holder.subtitleText.setTextColor(isAuto ? Color.parseColor("#2196F3") : Color.parseColor("#4CAF50"));
+                holder.subtitleText.setTextColor(isAuto ? Color.parseColor("#009688") : Color.parseColor("#4CAF50"));
                 holder.badge.setText(isAuto ? "AUTO" : "Premium");
-                holder.badge.setBackgroundColor(isAuto ? Color.parseColor("#2196F3") : Color.parseColor("#4CAF50"));
+                holder.badge.setBackgroundColor(isAuto ? Color.parseColor("#009688") : Color.parseColor("#4CAF50"));
                 if (isAuto) {
-                    holder.card.setStrokeColor(Color.parseColor("#2196F3"));
+                    holder.card.setStrokeColor(Color.parseColor("#009688"));
                     holder.card.setStrokeWidth((int) (2 * context.getResources().getDisplayMetrics().density));
                 } else {
                     holder.card.setStrokeColor(data.name.equals(currentServer) ? Color.parseColor(themeColor) : Color.parseColor("#E0E0E0"));
@@ -1680,7 +1680,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (backBtn != null) backBtn.setTextColor(currentColor);
         } catch (Exception e) {}
 
-        String[] colorsHex = {"#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3",
+        String[] colorsHex = {"#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#009688",
                 "#03A9F4", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39",
                 "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#795548", "#9E9E9E", "#607D8B"};
         int[] colorViews = {R.id.color_1, R.id.color_2, R.id.color_3, R.id.color_4, R.id.color_5,
