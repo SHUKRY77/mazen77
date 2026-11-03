@@ -22,7 +22,7 @@ public class SecurityGuard {
     // ثم انسخ قيمة SHA256 واحذف النقطتين (:) واجعلها أحرفاً صغيرة.
     // اتركها فارغة "" أثناء التطوير (يسمح بأي توقيع) ثم املأها قبل النشر.
     // ========================================================
-    private static final String EXPECTED_SIG_SHA256 = "5d73faee0f4748b754f802b40146998db1f56d8d050f7268b80e86cbbd7d79b5"; // مثال: "a1b2c3...."
+    private static final String EXPECTED_SIG_SHA256 = "4d5693265a57cad5a58c2fa4cfff429ac8a9e690e9b6b3f91a76ba197155ba1c";
 
     // يرجّع بصمة SHA-256 لشهادة توقيع التطبيق الحالي (hex صغير)
     public static String getAppSignatureSha256(Context ctx) {
@@ -80,16 +80,6 @@ public class SecurityGuard {
         } catch (Exception e) {
             return "";
         }
-    }
-
-    // فك تشفير مفتاح التشفير المخفي بصيغة Hex
-    public String getVaultKey() {
-        String hexKey = "4d617a656e566f7274657850726f5365637572654b6579323032364056697021";
-        StringBuilder out = new StringBuilder();
-        for (int i = 0; i < hexKey.length() - 1; i += 2) {
-            out.append((char) Integer.parseInt(hexKey.substring(i, (i + 2)), 16));
-        }
-        return out.toString();
     }
 
     // فحص شامل للروت 
