@@ -22,13 +22,13 @@ public class DataWaveView extends View {
 
     private void init() {
         paintLine1 = new Paint();
-        paintLine1.setColor(Color.parseColor("#4CAF50")); 
+        paintLine1.setColor(Color.parseColor("#009688"));
         paintLine1.setStyle(Paint.Style.STROKE);
         paintLine1.setStrokeWidth(2f); // خط رفيع
         paintLine1.setAntiAlias(true);
 
         paintLine2 = new Paint();
-        paintLine2.setColor(Color.parseColor("#81C784")); 
+        paintLine2.setColor(Color.parseColor("#81C784"));
         paintLine2.setStyle(Paint.Style.STROKE);
         paintLine2.setStrokeWidth(1.5f); // خط أنحف
         paintLine2.setAntiAlias(true);
@@ -48,7 +48,7 @@ public class DataWaveView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        
+
         int width = getWidth();
         int height = getHeight();
         int centerY = height / 2;
@@ -56,7 +56,7 @@ public class DataWaveView extends View {
         path1.reset();
         path2.reset();
 
-        if (!isAnimating) return; 
+        if (!isAnimating) return;
 
         path1.moveTo(0, centerY);
         path2.moveTo(0, centerY);
@@ -73,8 +73,8 @@ public class DataWaveView extends View {
         canvas.drawPath(path2, paintLine2);
 
         if (isAnimating) {
-            phase += 0.1f; 
-            invalidate(); 
+            phase += 0.1f;
+            invalidate();
         }
     }
 }

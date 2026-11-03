@@ -697,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         
         TextView subtitle = new TextView(this);
         subtitle.setText(String.format(Locale.US, "New Config Version: %.1f", currentConfigVersion));
-        subtitle.setTextColor(Color.parseColor("#4CAF50"));
+        subtitle.setTextColor(Color.parseColor("#009688"));
         subtitle.setTextSize(13f);
         subtitle.setTypeface(null, android.graphics.Typeface.BOLD);
         subtitle.setGravity(Gravity.CENTER);
@@ -1268,7 +1268,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         } else {
                             text.setText("Already up to date!");
                         }
-                        text.setTextColor(Color.parseColor("#4CAF50"));
+                        text.setTextColor(Color.parseColor("#009688"));
                     } else {
                         text.setText("Update Failed!");
                         text.setTextColor(Color.parseColor("#F44336"));
@@ -1551,9 +1551,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (isServer) {
                 boolean isAuto = data.name.toLowerCase().contains("auto");
                 holder.subtitleText.setText(data.subtitle);
-                holder.subtitleText.setTextColor(isAuto ? Color.parseColor("#009688") : Color.parseColor("#4CAF50"));
+                holder.subtitleText.setTextColor(isAuto ? Color.parseColor("#009688") : Color.parseColor("#009688"));
                 holder.badge.setText(isAuto ? "AUTO" : "Premium");
-                holder.badge.setBackgroundColor(isAuto ? Color.parseColor("#009688") : Color.parseColor("#4CAF50"));
+                holder.badge.setBackgroundColor(isAuto ? Color.parseColor("#009688") : Color.parseColor("#009688"));
                 if (isAuto) {
                     holder.card.setStrokeColor(Color.parseColor("#009688"));
                     holder.card.setStrokeWidth((int) (2 * context.getResources().getDisplayMetrics().density));
@@ -1563,7 +1563,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             } else {
                 holder.subtitleText.setText(data.subtitle);
-                holder.subtitleText.setTextColor(Color.parseColor("#4CAF50"));
+                holder.subtitleText.setTextColor(Color.parseColor("#009688"));
                 
                 boolean isSsh = (data.link != null) && (data.link.startsWith("SSH_PAYLOAD|") || data.link.startsWith("SSH_EXT|"));
                 boolean isOvpn = (data.link != null) && (data.link.contains("client") && data.link.contains("remote") || data.link.contains("<ca>"));
@@ -1681,7 +1681,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } catch (Exception e) {}
 
         String[] colorsHex = {"#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#009688",
-                "#03A9F4", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39",
+                "#03A9F4", "#00BCD4", "#009688", "#009688", "#8BC34A", "#CDDC39",
                 "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#795548", "#9E9E9E", "#607D8B"};
         int[] colorViews = {R.id.color_1, R.id.color_2, R.id.color_3, R.id.color_4, R.id.color_5,
                 R.id.color_6, R.id.color_7, R.id.color_8, R.id.color_9, R.id.color_10,
