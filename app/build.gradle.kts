@@ -1,10 +1,10 @@
 plugins { id("com.android.application") }
 
 android {
-    namespace = "com.maxtunnel.vip"
+    namespace = "com.abusultan.vip"
     compileSdk = 35
     defaultConfig {
-        applicationId = "com.maxtunnel.vip"
+        applicationId = "com.abusultan.vip"
         ndk { abiFilters += listOf("arm64-v8a") }
         minSdk = 23
         targetSdk = 35

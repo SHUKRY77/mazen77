@@ -115,6 +115,7 @@ $tab = (string)($_GET['tab'] ?? 'dashboard');
 $mode = $tab === 'ssh' ? 'ssh' : 'v2ray';
 $editServer = null; if (!empty($_GET['edit_server'])) { $q=db()->prepare('SELECT * FROM servers WHERE id=?'); $q->execute([$_GET['edit_server']]); $editServer=$q->fetch() ?: null; }
 $editPayload = null; if (!empty($_GET['edit_payload'])) { $q=db()->prepare('SELECT * FROM payloads WHERE id=?'); $q->execute([$_GET['edit_payload']]); $editPayload=$q->fetch() ?: null; $tab='payloads'; }
+$selectedProtocol = (string)($editServer['protocol'] ?? ($mode === 'ssh' ? 'ssh' : 'vless'));
 $serverWhere = $mode === 'ssh' ? "WHERE protocol LIKE 'ssh%' OR protocol='dnstt'" : "WHERE protocol NOT LIKE 'ssh%' AND protocol!='dnstt'";
 $servers = db()->query('SELECT id,country,subtitle,protocol,host,port,network,tls,active,updated_at FROM servers '.$serverWhere.' ORDER BY updated_at DESC')->fetchAll();
 $payloads = db()->query('SELECT id,network,subtitle,active,updated_at FROM payloads ORDER BY updated_at DESC')->fetchAll();
@@ -139,7 +140,7 @@ $pv = fn($k,$d='') => $esc($editPayload[$k] ?? $d);
 <div class="grid">
 <div><label>التطبيق المستهدف</label><input type="hidden" name="target_app" value="Max Tunnel"><span class="pill">Max Tunnel فقط</span></div>
 <?php if ($mode==='ssh'): ?>
-<div><label>Protocol</label><select id="ssh_protocol" name="protocol"><option value="ssh">SSH-Direct</option><option value="ssh-proxy">SSH-Proxy</option><option value="ssh-payload">SSH-Payload</option><option value="ssh-proxy-payload">SSH-Proxy-Payload</option><option value="ssh-tls">SSH-TLS</option><option value="ssh-tls-proxy">SSH-TLS-Proxy</option><option value="ssh-tls-payload">SSH-TLS-Payload</option><option value="ssh-tls-proxy-payload">SSH-TLS-Proxy-Payload</option><option value="dnstt">SSH-DNSTT</option></select></div>
+<div><label>Protocol</label><select id="ssh_protocol" name="protocol"><option value="ssh" <?=$selectedProtocol==='ssh'?'selected':''?>>SSH-Direct</option><option value="ssh-proxy" <?=$selectedProtocol==='ssh-proxy'?'selected':''?>>SSH-Proxy</option><option value="ssh-payload" <?=$selectedProtocol==='ssh-payload'?'selected':''?>>SSH-Payload</option><option value="ssh-proxy-payload" <?=$selectedProtocol==='ssh-proxy-payload'?'selected':''?>>SSH-Proxy-Payload</option><option value="ssh-tls" <?=$selectedProtocol==='ssh-tls'?'selected':''?>>SSH-TLS</option><option value="ssh-tls-proxy" <?=$selectedProtocol==='ssh-tls-proxy'?'selected':''?>>SSH-TLS-Proxy</option><option value="ssh-tls-payload" <?=$selectedProtocol==='ssh-tls-payload'?'selected':''?>>SSH-TLS-Payload</option><option value="ssh-tls-proxy-payload" <?=$selectedProtocol==='ssh-tls-proxy-payload'?'selected':''?>>SSH-TLS-Proxy-Payload</option><option value="dnstt" <?=$selectedProtocol==='dnstt'?'selected':''?>>SSH-DNSTT</option></select></div>
 <div><label>Remarks / Country Name</label><input name="country" required value="<?=$sv('country')?>" placeholder="ألمانيا 🇩🇪 أو اسم السيرفر"></div>
 <div><label>Network Name</label><input name="carrier" value="<?=$sv('carrier')?>" placeholder="STC, Zain..."></div>
 <div><label>Subtitle</label><input name="subtitle" value="<?=$sv('subtitle')?>" placeholder="Send: 1100 Type: 8294"></div>
@@ -171,10 +172,10 @@ $pv = fn($k,$d='') => $esc($editPayload[$k] ?? $d);
 <script>
 (function(){
   const sel=document.getElementById('ssh_protocol'); if(!sel)return;
-  const set=(id,on)=>{const e=document.getElementById(id);if(e)e.style.display=on?'':'none';};
+  const set=(id,on)=>{const e=document.getElementById(id);if(e){e.style.display=on?'':'none';e.querySelectorAll('input,select,textarea').forEach(x=>x.disabled=!on);}};
   function sync(){const v=sel.value||''; const tls=v.indexOf('tls')>=0; const proxy=v.indexOf('proxy')>=0; const payload=v.indexOf('payload')>=0; const dns=v==='dnstt';
     set('ssh_sni_field',tls); set('ssh_tls_field',tls); set('ssh_proxy_field',proxy); set('ssh_payload_field',payload); set('ssh_dns_fields',dns);
-    const port=document.querySelector('input[name="port"]'); if(port && !port.dataset.edited) port.value=tls?'443':'22';
+    const port=document.querySelector('input[name="port"]'); if(port && !port.dataset.edited) port.value=dns?'53':(tls?'443':'22');
   }
   sel.addEventListener('change',sync); sync();
 })();
