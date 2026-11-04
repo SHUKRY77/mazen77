@@ -7,39 +7,31 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
 
-    <!-- صلاحية تتبع الإعلانات لزيادة أرباح AdMob وكذلك Unity Ads و Start.io -->
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
-
-    <application 
-        android:name=".KINGVpnApp" 
+    <application
+        android:name=".KINGVpnApp"
         android:allowBackup="false"
-        android:icon="@drawable/app_logo" 
-        android:roundIcon="@drawable/app_logo" 
-        android:label="@string/app_name" 
-        android:supportsRtl="false" 
-        android:theme="@style/AppTheme" 
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="false"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
-        
-        <!-- معرف التطبيق الحقيقي الخاص بك في AdMob (تم الحفاظ عليه كما هو) -->
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-8090698487945807~3910973773" />
-            
+
         <!-- 🌟 إضافة معرف تطبيق Start.io الخاص بـ abusultan VIP 🌟 -->
         <meta-data
             android:name="com.startapp.sdk.APPLICATION_ID"
             android:value="208638219" />
-            
+
         <!-- ملاحظة: إعلانات Unity لا تحتاج إلى Meta-data هنا، بل سيتم تفعيلها داخل ملفات الجافا -->
-        
-        <activity 
-            android:name=".MainActivity" 
+
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

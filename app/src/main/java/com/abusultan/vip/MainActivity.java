@@ -189,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        MobileAds.initialize(this, initializationStatus -> {});
         setContentView(R.layout.activity_main);
         prefs = getSharedPreferences("vpn_settings_data", Context.MODE_PRIVATE);
 
@@ -210,22 +209,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (cardTimeBox != null) cardTimeBox.setOnClickListener(v -> showManualAdDialog());
         View btnAddTime = findViewById(R.id.btn_add_time);
         if (btnAddTime != null) btnAddTime.setOnClickListener(v -> showManualAdDialog());
-
-        mAdView = findViewById(R.id.adView);
-        if (mAdView != null) {
-            mAdView.setAdListener(new AdListener() {
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Pq.p("🚨 [صائد الأخطاء - البانر]: فشل التحميل. السبب: " + loadAdError.getMessage());
-                }
-            });
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
-        }
-
-        loadRewardedAd();
-        loadInterstitialAd();
 
         tempSelectedColor = prefs.getString("theme_color_hex", "#009688");
         selectedServerName = prefs.getString("selectedServerName", "Auto select servers");
@@ -410,21 +393,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void loadInterstitialAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(this, "ca-app-pub-8090698487945807/7371546877", adRequest,
-            new InterstitialAdLoadCallback() {
-                @Override
-                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                    mInterstitialAd = interstitialAd;
-                }
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    mInterstitialAd = null;
-                    Pq.p("🚨 [صائد الأخطاء - إعلان بيني]: فشل التحميل. السبب: " + loadAdError.getMessage());
-                }
-            });
-    }
+    private void loadInterstitialAd() { mInterstitialAd = null; }
 
     private void saveServersToFile(String encryptedData) {
         try {
@@ -558,22 +527,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }).start();
     }
 
-    private void loadRewardedAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        RewardedAd.load(this, "ca-app-pub-8090698487945807/5663290139",
-            adRequest, new RewardedAdLoadCallback() {
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    rewardedAd = null;
-                    Pq.p("🚨 [صائد الأخطاء - إعلان المكافأة]: فشل تحميل الإعلان. السبب: " + getArabicAdError(loadAdError.getCode()) + " | تفاصيل: " + loadAdError.getMessage());
-                }
-                @Override
-                public void onAdLoaded(@NonNull RewardedAd ad) {
-                    rewardedAd = ad;
-                    Pq.p("✅ تم تحميل إعلان المكافأة بنجاح وجاهز للعرض.");
-                }
-            });
-    }
+    private void loadRewardedAd() { rewardedAd = null; }
 
     private String getArabicAdError(int errorCode) {
         switch (errorCode) {
@@ -753,20 +707,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             statusLogText.setText("Connected");
             statusLogText.setTextColor(greenColor);
         }
-
-        Handler adRetryHandler = new Handler(Looper.getMainLooper());
-        adRetryHandler.postDelayed(() -> {
-            loadRewardedAd();
-            loadInterstitialAd();
-        }, 1500);
-        adRetryHandler.postDelayed(() -> {
-            if (rewardedAd == null) loadRewardedAd();
-            if (mInterstitialAd == null) loadInterstitialAd();
-        }, 6000);
-        adRetryHandler.postDelayed(() -> {
-            if (rewardedAd == null) loadRewardedAd();
-            if (mInterstitialAd == null) loadInterstitialAd();
-        }, 15000);
 
         pingHandler.removeCallbacks(pingRunnable);
         pingHandler.post(pingRunnable);
