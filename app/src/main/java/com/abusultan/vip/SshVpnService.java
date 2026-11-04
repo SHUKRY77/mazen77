@@ -38,10 +38,10 @@ public class SshVpnService extends VpnService {
     private static final String CONN_TYPE_HTTP_PAYLOAD = "http_payload";
     private static final String CONN_TYPE_TLS_PAYLOAD = "tls_payload";
     private static final String CONN_TYPE_TLS_PROXY_PAYLOAD = "tls_proxy_payload";
-    private static final String CONN_TYPE_SSL_PROXY   = "ssl_proxy";   
-    private static final String CONN_TYPE_DIRECT      = "direct";      
-    private static final String CONN_TYPE_UDP         = "udp";         
-    private static final String CONN_TYPE_SLOWDNS     = "slowdns";     
+    private static final String CONN_TYPE_SSL_PROXY   = "ssl_proxy";
+    private static final String CONN_TYPE_DIRECT      = "direct";
+    private static final String CONN_TYPE_UDP         = "udp";
+    private static final String CONN_TYPE_SLOWDNS     = "slowdns";
 
     private static final int REMOTE_UDPGW_PORT = 7300;
     private static final int LOCAL_UDPGW_FORWARD_PORT = 7300;

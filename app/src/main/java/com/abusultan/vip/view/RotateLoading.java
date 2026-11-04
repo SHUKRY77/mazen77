@@ -52,7 +52,7 @@ public class RotateLoading extends View {
         this.I = 10;
         this.T = 190;
         this.O1 = true;
-        this.f = Color.parseColor("#E53935"); // لون مبدئي، سيتم تغييره من MainActivity
+        this.f = Color.parseColor("#009688"); // لون مبدئي، سيتم تغييره من MainActivity
         c();
     }
 
@@ -160,15 +160,15 @@ public class RotateLoading extends View {
         this.N1 = 10.0f;
         int i5 = this.h;
         // 🌟 ضبط حدود الدائرة لتبقى داخل الإطار (تمت زيادة المسافة الداخلية margin)
-        int margin = i5 * 4; 
+        int margin = i5 * 4;
         this.A = new RectF(margin, margin, i - margin, i2 - margin);
         int i7 = this.q;
         this.B = new RectF(margin + i7, margin + i7, (i - margin) + i7, (i2 - margin) + i7);
     }
 
     // 🌟 دالة مهمة لتغيير لون الدائرة من MainActivity
-    public void setColor(int i) { 
-        this.f = i; 
+    public void setColor(int i) {
+        this.f = i;
         this.t.setColor(i);
         invalidate();
     }

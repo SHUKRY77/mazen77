@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layoutDirection="ltr">
-    
+
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="55dp">
@@ -19,7 +19,7 @@
             app:subtitleTextAppearance="@style/ToolbarSubtitleTheme"
             app:titleTextAppearance="@style/ToolbarTitleTheme" />
     </com.google.android.material.appbar.AppBarLayout>
-    
+
     <androidx.core.widget.NestedScrollView
         android:paddingBottom="10dp"
         android:layout_width="match_parent"
@@ -28,14 +28,14 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            
+
             <LinearLayout
                 android:orientation="vertical"
                 android:id="@+id/advancesettingsLinearLayout"
                 android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -68,7 +68,7 @@
                             android:layout_height="wrap_content" />
                     </RelativeLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
@@ -100,7 +100,7 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -134,7 +134,7 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -168,7 +168,7 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -197,7 +197,7 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -231,7 +231,7 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -277,7 +277,7 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="vertical"
@@ -344,14 +344,14 @@
                         </RadioGroup>
                     </LinearLayout>
                 </LinearLayout>
-                
+
                 <View
                     android:background="?android:attr/dividerVertical"
                     android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="15dp" />
-                
+
                 <TextView
                     android:textSize="12sp"
                     android:textColor="@color/colorPrimary"
@@ -360,7 +360,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="Additional setting" />
-                    
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="vertical"
@@ -429,7 +429,7 @@
                             android:text="Deactivate" />
                     </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -454,7 +454,7 @@
                             android:text="SSH Payload Generator" />
                     </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -479,7 +479,7 @@
                             android:text="IP Hunter" />
                     </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:gravity="center"
                     android:orientation="horizontal"
@@ -504,7 +504,7 @@
                             android:text="Host Checker" />
                     </LinearLayout>
                 </LinearLayout>
-                
+
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
@@ -516,10 +516,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Advance settings" />
-                    
+
                     <include layout="@layout/more_set" />
                 </LinearLayout>
-                
+
             </LinearLayout>
         </RelativeLayout>
     </androidx.core.widget.NestedScrollView>

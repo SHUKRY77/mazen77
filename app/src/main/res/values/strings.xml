@@ -2,10 +2,10 @@
 <resources>
     <string name="app_name">abusultan VIP</string>
     <string name="app_copyright">All Rights Reserved</string>
-    
+
     <string name="app_name_before">abusultan </string>
     <string name="app_name_after">VIP</string>
-    
+
     <string name="title_tethering_subnet">Tethering Subnet</string>
     <string name="summary_tethering_subnet">Set subnet for hotspot sharing</string>
     <string name="pause_vpn_on_blanked_screen_title">Pause VPN on blanked screen</string>

@@ -81,11 +81,11 @@ public class SecurityGuard {
         }
     }
 
-    // فحص شامل للروت 
+    // فحص شامل للروت
     public static boolean isDeviceRooted() {
         String[] paths = {
-            "/system/app/Superuser.apk", "/sbin/su", "/system/bin/su", 
-            "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su", 
+            "/system/app/Superuser.apk", "/sbin/su", "/system/bin/su",
+            "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su",
             "/system/sd/xbin/su", "/system/bin/failsafe/su", "/data/local/su", "/su/bin/su"
         };
         for (String path : paths) {
@@ -95,7 +95,7 @@ public class SecurityGuard {
         return buildTags != null && buildTags.contains("test-keys");
     }
 
-    // منع التنصت وتحليل الشبكة 
+    // منع التنصت وتحليل الشبكة
     public static boolean isDebuggerAttached() {
         return Debug.isDebuggerConnected() || Debug.waitingForDebugger();
     }

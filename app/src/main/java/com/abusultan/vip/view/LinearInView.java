@@ -26,7 +26,7 @@ public class LinearInView extends View {
     public int Q1 = 1;
     public float T = 0.0f;
     public int a = 10;
-    public int b = Color.parseColor("#00E676"); // أخضر
+    public int b = Color.parseColor("#009688"); // أخضر
     public int c;
     public RectF fRect;
     public Paint h;
@@ -70,7 +70,7 @@ public class LinearInView extends View {
     public final Path c() {
         Path path = new Path();
         if (this.fRect == null) return path;
-        
+
         float f3 = this.fRect.left;
         float f2 = this.fRect.bottom;
         for (int i2 = 0; i2 < this.A.size(); i2++) {

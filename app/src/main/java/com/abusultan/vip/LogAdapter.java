@@ -55,15 +55,15 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull LogViewHolder holder, int position) {
         String fullLog = logList.get(position);
-        
+
         // البحث عن القوس المعكوس ] لتحديد نهاية الوقت
         int endBracketIndex = fullLog.indexOf("]");
-        
+
         if (endBracketIndex != -1) {
             // استخدام SpannableString لتلوين جزء معين من النص
             SpannableString spannable = new SpannableString(fullLog);
             // تلوين الوقت باللون الأزرق الفاتح الجميل
-            spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#2196F3")), 0, endBracketIndex + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#009688")), 0, endBracketIndex + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             holder.logTextView.setText(spannable);
         } else {
             // إذا لم يكن هناك قوس (نص عادي) يظهر باللون الرمادي الافتراضي

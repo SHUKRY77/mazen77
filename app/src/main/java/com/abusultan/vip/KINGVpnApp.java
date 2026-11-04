@@ -24,14 +24,14 @@ public class KINGVpnApp extends Application {
         defaultPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // 2. التحقق مما إذا كان التطبيق يفتح لأول مرة (لإجراء التحديثات التلقائية لاحقاً)
-        int currentVersionCode = 1; 
+        int currentVersionCode = 1;
         if (defaultPreferences.getInt("app_version_code", 0) != currentVersionCode) {
             isFirstRun = true;
             defaultPreferences.edit().putInt("app_version_code", currentVersionCode).apply();
         }
 
         // 3. تهيئة مكتبة MMKV لتسريع قراءة سيرفرات V2Ray
-        
+
     }
 
     public static KINGVpnApp getInstance() {

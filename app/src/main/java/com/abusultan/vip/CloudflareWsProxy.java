@@ -48,7 +48,7 @@ public class CloudflareWsProxy implements Proxy {
             Pq.p("Establishing secure connection...");
             SSLSocketFactory sslFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket(socket, proxyIp, proxyPort, true);
-            
+
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 SSLParameters sslParameters = sslSocket.getSSLParameters();
                 sslParameters.setServerNames(Collections.singletonList(new SNIHostName(sni)));
@@ -105,11 +105,11 @@ public class CloudflareWsProxy implements Proxy {
 
                     if (currentRes.contains("HTTP/1.1 101") || currentRes.contains("HTTP/1.0 200 Connection established") || currentRes.contains("HTTP/1.1 200")) {
                         isTunnelOpen = true;
-                        break; 
+                        break;
                     }
 
                     if (responseCount >= expectedResponses) {
-                        break; 
+                        break;
                     }
                     response.setLength(0);
                 }
@@ -118,11 +118,11 @@ public class CloudflareWsProxy implements Proxy {
             if (!isTunnelOpen) {
                 throw new Exception("Connection closed by peer.");
             }
-            
+
             Pq.p("Tunnel successfully established.");
         } catch (Exception e) {
             Pq.p("Proxy Error: Connection failed.");
-            throw e; 
+            throw e;
         }
     }
 

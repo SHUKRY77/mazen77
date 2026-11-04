@@ -70,7 +70,7 @@ public class LinearOutView extends View {
     public final Path c() {
         Path path = new Path();
         if (this.fRect == null) return path;
-        
+
         float f3 = this.fRect.left;
         float f2 = this.fRect.bottom;
         for (int i2 = 0; i2 < this.A.size(); i2++) {
@@ -137,7 +137,7 @@ public class LinearOutView extends View {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (this.s == null || this.s.isEmpty()) return;
-        canvas.drawPath(c(), this.h); 
+        canvas.drawPath(c(), this.h);
     }
 
     @Override

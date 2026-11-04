@@ -4,12 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_card"
     android:layout_width="match_parent"
-    android:layout_height="48dp" 
+    android:layout_height="48dp"
     android:layout_marginBottom="6dp"
     android:layout_marginStart="4dp"
     android:layout_marginEnd="4dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="3dp" 
+    app:cardElevation="3dp"
     app:strokeWidth="1.2dp"
     app:strokeColor="#E0E0E0"
     app:cardBackgroundColor="@color/white">
@@ -17,7 +17,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="8dp" 
+        android:paddingStart="8dp"
         android:clipChildren="true"
         android:clipToPadding="true">
 

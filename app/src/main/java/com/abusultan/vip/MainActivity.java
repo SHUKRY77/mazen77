@@ -106,16 +106,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean isConnecting = false;
     private static final int VPN_REQUEST_CODE = 1001;
 
-    private String tempSelectedColor = "#E53935";
+    private String tempSelectedColor = "#009688";
     private SharedPreferences prefs;
 
     private String selectedServerName = "Auto select servers";
     private String selectedServerLink = "";
-    private String selectedServerSubtitle = "Smart Premium Selection"; 
-    
+    private String selectedServerSubtitle = "Smart Premium Selection";
+
     private String selectedPayloadName = "Select Network Payload";
     private String selectedPayloadLink = "";
-    private String selectedPayloadSubtitle = "V2Ray / SSH Network"; 
+    private String selectedPayloadSubtitle = "V2Ray / SSH Network";
 
     private float currentConfigVersion = 5.4f;
 
@@ -131,15 +131,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RewardedAd rewardedAd;
     private InterstitialAd mInterstitialAd;
 
-    private long userRemainingTime = 0; 
-    private int gracePeriodSeconds = -1; 
+    private long userRemainingTime = 0;
+    private int gracePeriodSeconds = -1;
     private TextView ac_xp;
 
     // ⚠️ يجب أن تطابق هذه القيمة بالضبط قيمة API_WRAP_KEY الموجودة في ملف .env على السيرفر
     private static final String API_WRAP_PASSPHRASE = "Hs6RpTq1WvNm4YbXk8DcZj0OeFl3GaUi7MtQsRz2Pw=";
 
     private String getSecuredApiUrl() {
-        String rawBase = "aHR0cHM6Ly9hcHAuYXNzYWcyMDI2LmNvbS9jb3JlLnBocD8="; 
+        String rawBase = "aHR0cHM6Ly9hcHAuYXNzYWcyMDI2LmNvbS9jb3JlLnBocD8=";
         try {
             String decodedBase = new String(Base64.decode(rawBase, Base64.DEFAULT), "UTF-8");
             return decodedBase + "action=get_max_app_data&proto=2";
@@ -192,12 +192,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MobileAds.initialize(this, initializationStatus -> {});
         setContentView(R.layout.activity_main);
         prefs = getSharedPreferences("vpn_settings_data", Context.MODE_PRIVATE);
-        
+
         ac_xp = findViewById(R.id.ac_xp);
-        
+
         boolean isFirstRun = prefs.getBoolean("is_first_run", true);
         if (isFirstRun) {
-            userRemainingTime = 2 * 3600; 
+            userRemainingTime = 2 * 3600;
             prefs.edit().putBoolean("is_first_run", false).apply();
             saveSecureTime(userRemainingTime);
         } else {
@@ -223,19 +223,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             AdRequest adRequest = new AdRequest.Builder().build();
             mAdView.loadAd(adRequest);
         }
-        
+
         loadRewardedAd();
         loadInterstitialAd();
 
-        tempSelectedColor = prefs.getString("theme_color_hex", "#E53935");
+        tempSelectedColor = prefs.getString("theme_color_hex", "#009688");
         selectedServerName = prefs.getString("selectedServerName", "Auto select servers");
         selectedServerLink = prefs.getString("selectedServerLink", "");
-        selectedServerSubtitle = prefs.getString("selectedServerSubtitle", "Smart Premium Selection"); 
+        selectedServerSubtitle = prefs.getString("selectedServerSubtitle", "Smart Premium Selection");
         selectedPayloadName = prefs.getString("selectedPayloadName", "Select Network Payload");
         selectedPayloadLink = prefs.getString("selectedPayloadLink", "");
-        selectedPayloadSubtitle = prefs.getString("selectedPayloadSubtitle", "V2Ray / SSH Network"); 
+        selectedPayloadSubtitle = prefs.getString("selectedPayloadSubtitle", "V2Ray / SSH Network");
         currentConfigVersion = prefs.getFloat("config_version", 5.4f);
-        
+
         String cachedJson = readServersFromFile();
         if (!cachedJson.isEmpty()) {
              parseAndSaveConfigVersion(cachedJson);
@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateSelectionTexts();
         safeColorApply();
         fetchServersFromPanel(false);
-        
+
         SharedPreferences vpnStatePrefs = getSharedPreferences("vpn_settings_data", MODE_PRIVATE);
         boolean wasConnected = vpnStatePrefs.getBoolean("is_vpn_active_now", false);
         if (wasConnected) {
@@ -482,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String decryptSafe(String text) {
         if (text == null || text.isEmpty()) return text;
-        if (text.startsWith("vless://") || text.startsWith("vmess://") || text.startsWith("trojan://") 
+        if (text.startsWith("vless://") || text.startsWith("vmess://") || text.startsWith("trojan://")
                 || text.startsWith("SSH_PAYLOAD|") || text.startsWith("SSH_EXT|")) {
             return text;
         }
@@ -507,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public void run() {
             if (isVpnConnected) {
                 measureRealPing();
-                pingHandler.postDelayed(this, 4000); 
+                pingHandler.postDelayed(this, 4000);
             }
         }
     };
@@ -543,15 +543,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (finalPing > 0) {
                         serverPingText.setText(finalPing + "ms");
                         if (finalPing <= 120) {
-                            serverPingText.setTextColor(Color.parseColor("#00E676")); 
+                            serverPingText.setTextColor(Color.parseColor("#009688"));
                         } else if (finalPing <= 300) {
-                            serverPingText.setTextColor(Color.parseColor("#FFC107")); 
+                            serverPingText.setTextColor(Color.parseColor("#009688"));
                         } else {
-                            serverPingText.setTextColor(Color.parseColor("#FF5722")); 
+                            serverPingText.setTextColor(Color.parseColor("#009688"));
                         }
                     } else {
                         serverPingText.setText("999ms");
-                        serverPingText.setTextColor(Color.parseColor("#FF5722"));
+                        serverPingText.setTextColor(Color.parseColor("#009688"));
                     }
                 }
             });
@@ -560,16 +560,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void loadRewardedAd() {
         AdRequest adRequest = new AdRequest.Builder().build();
-        RewardedAd.load(this, "ca-app-pub-8090698487945807/5663290139", 
+        RewardedAd.load(this, "ca-app-pub-8090698487945807/5663290139",
             adRequest, new RewardedAdLoadCallback() {
-                @Override 
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) { 
-                    rewardedAd = null; 
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    rewardedAd = null;
                     Pq.p("🚨 [صائد الأخطاء - إعلان المكافأة]: فشل تحميل الإعلان. السبب: " + getArabicAdError(loadAdError.getCode()) + " | تفاصيل: " + loadAdError.getMessage());
                 }
-                @Override 
-                public void onAdLoaded(@NonNull RewardedAd ad) { 
-                    rewardedAd = ad; 
+                @Override
+                public void onAdLoaded(@NonNull RewardedAd ad) {
+                    rewardedAd = ad;
                     Pq.p("✅ تم تحميل إعلان المكافأة بنجاح وجاهز للعرض.");
                 }
             });
@@ -599,8 +599,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (rewardedAd != null) {
             rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                 @Override public void onAdDismissedFullScreenContent() { rewardedAd = null; loadRewardedAd(); }
-                @Override public void onAdFailedToShowFullScreenContent(AdError adError) { 
-                    rewardedAd = null; 
+                @Override public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    rewardedAd = null;
                     loadRewardedAd();
                     Pq.p("🚨 [صائد الأخطاء - عرض الإعلان]: فشل عرض إعلان المكافأة. السبب: " + adError.getMessage());
                 }
@@ -609,13 +609,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             Toast.makeText(this, "جاري تحضير الإعلان، يرجى الانتظار ثوانٍ...", Toast.LENGTH_SHORT).show();
             loadRewardedAd();
-            
+
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 if (rewardedAd != null) {
                     rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                         @Override public void onAdDismissedFullScreenContent() { rewardedAd = null; loadRewardedAd(); }
-                        @Override public void onAdFailedToShowFullScreenContent(AdError adError) { 
-                            rewardedAd = null; 
+                        @Override public void onAdFailedToShowFullScreenContent(AdError adError) {
+                            rewardedAd = null;
                             loadRewardedAd();
                         }
                     });
@@ -629,10 +629,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void grantReward() {
-        long rewardSeconds = 2 * 3600; 
-        userRemainingTime += rewardSeconds; 
-        gracePeriodSeconds = -1; 
-        if (ac_xp != null) ac_xp.setTextColor(Color.BLACK); 
+        long rewardSeconds = 2 * 3600;
+        userRemainingTime += rewardSeconds;
+        gracePeriodSeconds = -1;
+        if (ac_xp != null) ac_xp.setTextColor(Color.BLACK);
         saveSecureTime(userRemainingTime);
         updateTimeDisplay();
         Toast.makeText(this, "مبروك! تمت إضافة ساعتين بنجاح.", Toast.LENGTH_LONG).show();
@@ -676,25 +676,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void showCenterUpdateDialog() {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
-        
+
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setGravity(Gravity.CENTER);
         layout.setPadding(60, 40, 60, 40);
-        
+
         GradientDrawable shape = new GradientDrawable();
         shape.setCornerRadius(30f);
-        shape.setColor(Color.parseColor("#E3F2FD")); 
+        shape.setColor(Color.parseColor("#E3F2FD"));
         shape.setStroke(3, Color.parseColor("#009688"));
         layout.setBackground(shape);
-        
+
         TextView title = new TextView(this);
         title.setText("Servers Updated Successfully!");
         title.setTextColor(Color.parseColor("#009688"));
         title.setTextSize(16f);
         title.setTypeface(null, android.graphics.Typeface.BOLD);
         title.setGravity(Gravity.CENTER);
-        
+
         TextView subtitle = new TextView(this);
         subtitle.setText(String.format(Locale.US, "New Config Version: %.1f", currentConfigVersion));
         subtitle.setTextColor(Color.parseColor("#009688"));
@@ -702,10 +702,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         subtitle.setTypeface(null, android.graphics.Typeface.BOLD);
         subtitle.setGravity(Gravity.CENTER);
         subtitle.setPadding(0, 10, 0, 0);
-        
+
         layout.addView(title);
         layout.addView(subtitle);
-        
+
         dialog.setContentView(layout);
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -735,10 +735,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         isConnecting = false;
         isVpnConnected = true;
         stopSpinning();
-        
+
         getSharedPreferences("vpn_settings_data", MODE_PRIVATE).edit().putBoolean("is_vpn_active_now", true).apply();
 
-        int greenColor = Color.parseColor("#00E676");
+        int greenColor = Color.parseColor("#009688");
         if (circleProgress != null) {
             circleProgress.setVisibility(View.VISIBLE);
             circleProgress.setColor(greenColor);
@@ -792,10 +792,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void toggleConnection() {
         if (!isVpnConnected && !isConnecting) {
             if (userRemainingTime <= 0) {
-                showManualAdDialog(); 
+                showManualAdDialog();
                 return;
             }
-            
+
             if (mInterstitialAd != null) {
                 mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
                     @Override
@@ -871,16 +871,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void startSpinning() {
         isConnecting = true;
         vpnUptimeSeconds = 0;
-        
+
         if (tvDuration != null) tvDuration.setText("00:00:00");
-        
+
         if (connectionStatusText != null) {
             connectionStatusText.setText("Connecting...");
-            connectionStatusText.setTextColor(Color.parseColor("#FF9800"));
+            connectionStatusText.setTextColor(Color.parseColor("#009688"));
         }
         if (statusLogText != null) {
             statusLogText.setText("Connecting...");
-            statusLogText.setTextColor(Color.parseColor("#FF9800"));
+            statusLogText.setTextColor(Color.parseColor("#009688"));
         }
 
         if (circleProgress != null) {
@@ -912,11 +912,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         isConnecting = false;
         if (connectionStatusText != null) {
             connectionStatusText.setText("Disconnecting...");
-            connectionStatusText.setTextColor(Color.parseColor("#FF9800"));
+            connectionStatusText.setTextColor(Color.parseColor("#009688"));
         }
         if (statusLogText != null) {
             statusLogText.setText("Disconnecting...");
-            statusLogText.setTextColor(Color.parseColor("#FF9800"));
+            statusLogText.setTextColor(Color.parseColor("#009688"));
         }
         new Handler(Looper.getMainLooper()).postDelayed(this::stopVpnConnection, 600);
     }
@@ -978,8 +978,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void updateSelectionTexts() {
         TextView sText = findViewById(R.id.server_name);
         if (sText != null) sText.setText(selectedServerName);
-        
-        TextView sSubText = findViewById(R.id.server_info); 
+
+        TextView sSubText = findViewById(R.id.server_info);
         if (sSubText != null) {
             sSubText.setText(selectedServerSubtitle);
             try { sSubText.setTextColor(Color.parseColor(tempSelectedColor)); } catch (Exception e) {}
@@ -987,8 +987,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         TextView pText = findViewById(R.id.payload_name);
         if (pText != null) pText.setText(selectedPayloadName);
-        
-        TextView pSubText = findViewById(R.id.payload_info); 
+
+        TextView pSubText = findViewById(R.id.payload_info);
         if (pSubText != null) {
             pSubText.setText(selectedPayloadSubtitle);
             try { pSubText.setTextColor(Color.parseColor(tempSelectedColor)); } catch (Exception e) {}
@@ -1006,7 +1006,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (isVpnConnected || isConnecting) {
                 if (isVpnConnected) {
                     vpnUptimeSeconds++;
-                    
+
                     int h = vpnUptimeSeconds / 3600;
                     int m = (vpnUptimeSeconds % 3600) / 60;
                     int s = vpnUptimeSeconds % 60;
@@ -1016,11 +1016,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (userRemainingTime > 0) {
                         userRemainingTime--;
                         updateTimeDisplay();
-                        if (userRemainingTime % 10 == 0) { 
+                        if (userRemainingTime % 10 == 0) {
                             saveSecureTime(userRemainingTime);
                         }
                         if (userRemainingTime == 0) {
-                            gracePeriodSeconds = 10 * 60; 
+                            gracePeriodSeconds = 10 * 60;
                             Toast.makeText(MainActivity.this, "انتهى الرصيد! لديك مهلة 10 دقائق.", Toast.LENGTH_LONG).show();
                         }
                     } else if (gracePeriodSeconds > 0) {
@@ -1036,7 +1036,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                 }
-                
+
                 long currentRx = TrafficStats.getUidRxBytes(getApplicationInfo().uid);
                 long currentTx = TrafficStats.getUidTxBytes(getApplicationInfo().uid);
 
@@ -1047,7 +1047,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 long txSpeed = (currentTx - lastTxBytes);
 
                 if (rxSpeed <= 1024) rxSpeed = (long) (Math.random() * 300000) + 15000;
-                if (txSpeed <= 1024) txSpeed = (long) (Math.random() * 80000) + 5000; 
+                if (txSpeed <= 1024) txSpeed = (long) (Math.random() * 80000) + 5000;
 
                 if (rxSpeed < 0) rxSpeed = 0;
                 if (txSpeed < 0) txSpeed = 0;
@@ -1087,8 +1087,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void startVpnCore() {
         try {
-            String linkToSend = getLinkToTest(); 
-            
+            String linkToSend = getLinkToTest();
+
             if (linkToSend == null || linkToSend.isEmpty()) {
                 Toast.makeText(MainActivity.this, "تنبيه: السيرفر أو الشبكة فارغة!", Toast.LENGTH_LONG).show();
                 disconnectWithAnimation();
@@ -1120,10 +1120,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void stopVpnConnection() {
         if (ac_xp != null) ac_xp.setTextColor(Color.BLACK);
         updateTimeDisplay();
-        
+
         isVpnConnected = false;
         isConnecting = false;
-        
+
         getSharedPreferences("vpn_settings_data", MODE_PRIVATE).edit().putBoolean("is_vpn_active_now", false).apply();
 
         stopSpinning();
@@ -1146,7 +1146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             serverPingText.setText("~ ms");
             serverPingText.setTextColor(Color.parseColor(tempSelectedColor));
         }
-        
+
         if (btnConnectIcon != null)
             ViewCompat.setBackgroundTintList(btnConnectIcon, ColorStateList.valueOf(Color.parseColor(tempSelectedColor)));
 
@@ -1256,12 +1256,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 final boolean finalSuccess = isSuccess;
                 final boolean finalNewUpdate = isNewUpdate;
                 final String finalError = errorReason;
-                
+
                 runOnUiThread(() -> {
                     icon.clearAnimation();
                     if (finalSuccess) {
                         updateConfigVersionUi(currentConfigVersion);
-                        
+
                         if (finalNewUpdate) {
                             text.setText("Updated Successfully!");
                             showCenterUpdateDialog();
@@ -1271,7 +1271,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         text.setTextColor(Color.parseColor("#009688"));
                     } else {
                         text.setText("Update Failed!");
-                        text.setTextColor(Color.parseColor("#F44336"));
+                        text.setTextColor(Color.parseColor("#009688"));
                         Toast.makeText(MainActivity.this, finalError, Toast.LENGTH_LONG).show();
                     }
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -1296,7 +1296,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } catch (Exception e) {
                     Pq.p("🚨 [صائد الأخطاء - التحديث الخلفي]: فشل جلب التحديثات في الخلفية بسبب: " + e.getMessage());
                 }
-                
+
                 final String finalJson = fetchedJsonMem;
                 final boolean finalNewUpdate = isNewUpdate;
                 if (finalJson != null && !finalJson.isEmpty()) {
@@ -1384,7 +1384,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
             final List<ServerData> serverDataList = new ArrayList<>();
-            
+
             String jsonStr = readServersFromFile();
             if (jsonStr == null || jsonStr.isEmpty()) jsonStr = "[]";
 
@@ -1395,14 +1395,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         JSONArray jsonArray = new JSONArray(jsonStr);
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject obj = jsonArray.getJSONObject(i);
-                            
+
                             if (!obj.has("country")) continue;
 
                             String name = obj.optString("country", "Server " + (i + 1));
                             String link = obj.optString("config", "");
                             link = decryptSafe(link);
                             String displaySubtitle = obj.optString("subtitle", "Fast Server ⚡");
-                            
+
                             boolean exists = false;
                             for (ServerData sd : serverDataList) {
                                 if (sd.name.equals(name)) { exists = true; break; }
@@ -1411,30 +1411,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     } catch (Exception e) {}
                 }
-            } 
+            }
             else {
                 if (!jsonStr.isEmpty() && jsonStr.trim().startsWith("[")) {
                     try {
                         JSONArray jsonArray = new JSONArray(jsonStr);
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject obj = jsonArray.getJSONObject(i);
-                            
+
                             String name = "";
-                            String link = obj.optString("config", ""); 
+                            String link = obj.optString("config", "");
                             link = decryptSafe(link);
                             String subtitle = "";
-                            
+
                             if (obj.has("network")) {
                                 name = obj.optString("network", "Unknown Network");
                                 subtitle = obj.optString("subtitle", "Premium Network");
-                            } 
+                            }
                             else if (obj.has("name")) {
                                 name = obj.optString("name", "SSH Network");
                                 subtitle = obj.optString("info", "SSH Connection");
                             } else {
-                                continue; 
+                                continue;
                             }
-                            
+
                             boolean exists = false;
                             for (ServerData sd : serverDataList) {
                                 if (sd.name.equals(name)) { exists = true; break; }
@@ -1473,12 +1473,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     selectedPayloadSubtitle = data.subtitle;
                     prefs.edit().putString("selectedPayloadName", selectedPayloadName)
                                 .putString("selectedPayloadLink", selectedPayloadLink)
-                                .putString("selectedPayloadSubtitle", selectedPayloadSubtitle).apply(); 
+                                .putString("selectedPayloadSubtitle", selectedPayloadSubtitle).apply();
                 }
                 updateSelectionTexts();
                 dialog.dismiss();
             });
-            
+
             recyclerView.setAdapter(adapter);
 
             EditText searchBox = dialog.findViewById(R.id.search_box);
@@ -1564,13 +1564,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 holder.subtitleText.setText(data.subtitle);
                 holder.subtitleText.setTextColor(Color.parseColor("#009688"));
-                
+
                 boolean isSsh = (data.link != null) && (data.link.startsWith("SSH_PAYLOAD|") || data.link.startsWith("SSH_EXT|"));
                 boolean isOvpn = (data.link != null) && (data.link.contains("client") && data.link.contains("remote") || data.link.contains("<ca>"));
-                
+
                 if (isSsh) {
                     holder.badge.setText("SSH Tunnel");
-                    holder.badge.setBackgroundColor(Color.parseColor("#6B21A8")); 
+                    holder.badge.setBackgroundColor(Color.parseColor("#6B21A8"));
                     holder.card.setStrokeColor(data.name.equals(currentPayload) ? Color.parseColor("#6B21A8") : Color.parseColor("#E0E0E0"));
                 } else if (isOvpn) {
                     holder.badge.setText("OpenVPN");
@@ -1680,9 +1680,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (backBtn != null) backBtn.setTextColor(currentColor);
         } catch (Exception e) {}
 
-        String[] colorsHex = {"#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#009688",
-                "#03A9F4", "#00BCD4", "#009688", "#009688", "#8BC34A", "#CDDC39",
-                "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#795548", "#9E9E9E", "#607D8B"};
+        String[] colorsHex = {"#009688", "#009688", "#009688", "#009688", "#009688", "#009688",
+                "#009688", "#009688", "#009688", "#009688", "#009688", "#009688",
+                "#009688", "#009688", "#009688", "#009688", "#009688", "#009688", "#009688"};
         int[] colorViews = {R.id.color_1, R.id.color_2, R.id.color_3, R.id.color_4, R.id.color_5,
                 R.id.color_6, R.id.color_7, R.id.color_8, R.id.color_9, R.id.color_10,
                 R.id.color_11, R.id.color_12, R.id.color_13, R.id.color_14, R.id.color_15,
@@ -1749,8 +1749,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private char[] getDynamicVaultKey() {
         return new char[]{
-            (char)77, (char)65, (char)88, (char)95, 
-            (char)86, (char)73, (char)80, (char)95, 
+            (char)77, (char)65, (char)88, (char)95,
+            (char)86, (char)73, (char)80, (char)95,
             (char)50, (char)48, (char)50, (char)54
         };
     }
@@ -1788,7 +1788,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try {
             return Long.parseLong(xorDecrypt(saved));
         } catch (Exception e) {
-            return 0; 
+            return 0;
         }
     }
 }

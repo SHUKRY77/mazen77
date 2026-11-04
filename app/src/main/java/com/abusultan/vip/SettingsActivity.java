@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public class SettingsActivity extends AppCompatActivity {
-    
+
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
 

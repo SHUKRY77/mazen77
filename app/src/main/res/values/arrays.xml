@@ -62,7 +62,7 @@
         <item>IPOnDemand</item>
         <item>AsIs</item>
     </string-array>
-    
+
     <string-array name="routing_mode">
         <item>Global</item>
         <item>Bypass LAN</item>

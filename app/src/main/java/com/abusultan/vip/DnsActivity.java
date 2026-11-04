@@ -44,7 +44,7 @@ public class DnsActivity extends AppCompatActivity {
                     Toast.makeText(DnsActivity.this, "Please enter a valid domain or IP", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                
+
                 // بدء فحص الشبكة
                 performNetworkTest(domain);
             }
@@ -58,11 +58,11 @@ public class DnsActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
-        
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,20 +90,20 @@ public class DnsActivity extends AppCompatActivity {
                 final StringBuilder resultBuilder = new StringBuilder();
                 try {
                     long startTime = System.currentTimeMillis();
-                    
+
                     // محاولة الاتصال وجلب الآيبي
                     InetAddress[] addresses = InetAddress.getAllByName(domain);
-                    
+
                     long timeTaken = System.currentTimeMillis() - startTime;
 
                     resultBuilder.append("✓ SUCCESS!\n");
                     resultBuilder.append("Response Time: ").append(timeTaken).append(" ms\n\n");
                     resultBuilder.append("Resolved IP Addresses:\n");
-                    
+
                     for (InetAddress address : addresses) {
                         resultBuilder.append("➔ ").append(address.getHostAddress()).append("\n");
                     }
-                    
+
                 } catch (Exception e) {
                     resultBuilder.append("✗ FAILED to resolve.\n");
                     resultBuilder.append("Check your internet connection or domain name.\n");

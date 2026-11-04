@@ -29,7 +29,7 @@ public class CircleProgressBar extends View {
         this.c = 0;
         this.d = 100;
         this.f = -90;
-        this.h = Color.parseColor("#E53935"); // اللون الأحمر الافتراضي
+        this.h = Color.parseColor("#009688"); // اللون الأحمر الافتراضي
         b(context, attributeSet);
     }
 
@@ -39,16 +39,16 @@ public class CircleProgressBar extends View {
 
     public final void b(Context context, AttributeSet attributeSet) {
         this.q = new RectF();
-        
+
         Paint paint = new Paint(1);
         this.s = paint;
         // 🌟 هذا السطر هو الذي يصنع اللون الوردي الفاتح (شفافية 30% من اللون الأساسي)
-        paint.setColor(a(this.h, 0.3f)); 
+        paint.setColor(a(this.h, 0.3f));
         Paint paint2 = this.s;
         Paint.Style style = Paint.Style.STROKE;
         paint2.setStyle(style);
         this.s.setStrokeWidth(this.a);
-        
+
         Paint paint3 = new Paint(1);
         this.t = paint3;
         paint3.setColor(this.h);

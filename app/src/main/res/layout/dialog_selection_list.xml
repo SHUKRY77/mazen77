@@ -36,7 +36,7 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="38dp" 
+                    android:layout_height="38dp"
                     app:cardCornerRadius="19dp"
                     app:cardElevation="0dp"
                     app:cardBackgroundColor="@color/white">

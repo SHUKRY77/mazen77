@@ -8,9 +8,9 @@ public class Dl {
     // 1. دالة فك التشفير الأصلية (XOR + Base64) المطابقة للتطبيق المنافس
     public static String a(String str, String str2) {
         try {
-            byte[] data = Base64.decode(str, 0); 
+            byte[] data = Base64.decode(str, 0);
             byte[] key = Base64.decode(str2, 0);
-            
+
             int length = data.length;
             int length2 = key.length;
             int i = 0;
@@ -34,7 +34,7 @@ public class Dl {
         try {
             byte[] data = plainText.getBytes(StandardCharsets.UTF_8);
             byte[] key = Base64.decode(keyStringBase64, 0);
-            
+
             int length = data.length;
             int length2 = key.length;
             int i = 0;

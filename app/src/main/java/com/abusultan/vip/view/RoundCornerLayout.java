@@ -38,16 +38,16 @@ public class RoundCornerLayout extends FrameLayout {
         if (attributeSet != null) {
             // الطريقة الاحترافية والأكثر أماناً (تمنع انهيار التطبيق بسبب الـ dp)
             TypedArray a = context.obtainStyledAttributes(attributeSet, R.styleable.RoundCornerLayout);
-            
+
             // قراءة نصف قطر الزاوية بأمان تام
             this.cornerRadius = a.getDimension(R.styleable.RoundCornerLayout_cornerRadius, this.cornerRadius);
-            
+
             // قراءة حالات الزوايا (مفعلة أم لا)
             this.topLeftEnabled = a.getBoolean(R.styleable.RoundCornerLayout_topLeftEnabled, true);
             this.topRightEnabled = a.getBoolean(R.styleable.RoundCornerLayout_topRightEnabled, true);
             this.bottomLeftEnabled = a.getBoolean(R.styleable.RoundCornerLayout_bottomLeftEnabled, true);
             this.bottomRightEnabled = a.getBoolean(R.styleable.RoundCornerLayout_bottomRightEnabled, true);
-            
+
             a.recycle(); // إغلاق المصفوفة لتنظيف الذاكرة
         }
     }
@@ -61,10 +61,10 @@ public class RoundCornerLayout extends FrameLayout {
         int saveCount = canvas.save();
         Path path = new Path();
         RectF rectF = new RectF(0.0f, 0.0f, canvas.getWidth(), canvas.getHeight());
-        
+
         // مصفوفة لتحديد زوايا القص (كل زاوية تأخذ قيمتين X و Y)
         float[] radii = new float[8];
-        
+
         if (this.topLeftEnabled) {
             radii[0] = this.cornerRadius;
             radii[1] = this.cornerRadius;
@@ -81,7 +81,7 @@ public class RoundCornerLayout extends FrameLayout {
             radii[6] = this.cornerRadius;
             radii[7] = this.cornerRadius;
         }
-        
+
         path.addRoundRect(rectF, radii, Path.Direction.CW);
         canvas.clipPath(path);
         super.dispatchDraw(canvas);

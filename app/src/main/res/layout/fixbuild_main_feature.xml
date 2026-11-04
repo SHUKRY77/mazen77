@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1.0">
-    
+
     <LinearLayout
         android:gravity="center|top"
         android:orientation="vertical"
@@ -52,7 +52,7 @@
                         android:id="@+id/app_name_before"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="MAX "
+                        android:text="abusultan "
                         android:fontFamily="serif" />
                     <TextView
                         android:textSize="17sp"
@@ -62,7 +62,7 @@
                         android:id="@+id/app_name_after"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="vip"
+                        android:text="VIP"
                         android:fontFamily="serif" />
                 </LinearLayout>
                 <TextView
@@ -88,7 +88,7 @@
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
-    
+
     <androidx.core.widget.NestedScrollView
         android:gravity="center"
         android:orientation="vertical"
@@ -100,7 +100,7 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/main_toolbar"
         android:layout_above="@+id/ad_container">
-        
+
         <LinearLayout
             android:gravity="center|top"
             android:orientation="vertical"
@@ -123,7 +123,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1.0">
-                        
+
                         <com.abusultan.vip.DataWaveView
                             android:id="@+id/dataWaveView"
                             android:layout_width="match_parent"
@@ -154,7 +154,7 @@
                             app:strokeColor="@color/dataIn"
                             app:strokeWidth="1dp"
                             android:visibility="invisible" />
-                        <TextView  
+                        <TextView
                             android:textSize="10sp"
                             android:gravity="right"
                             android:id="@+id/livedata"
@@ -931,7 +931,7 @@
                     </RadioGroup>
                 </HorizontalScrollView>
             </LinearLayout>
-            
+
             <RelativeLayout
                 android:gravity="center"
                 android:layout_width="150dp"
@@ -1098,7 +1098,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone" />
-            
+
             <RelativeLayout
                 android:gravity="center"
                 android:id="@+id/switch_bg"
@@ -1109,7 +1109,7 @@
                 android:layout_height="21dp"
                 android:layout_marginTop="2dp"
                 android:visibility="gone">
-                
+
                 <Switch
                     android:textSize="9sp"
                     android:textStyle="bold"
@@ -1139,14 +1139,14 @@
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:background="@color/transparent">
-        
+
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:adSize="BANNER"
             app:adUnitId="ca-app-pub-8090698487945807/8458589801" />
-            
+
     </RelativeLayout>
 
 </RelativeLayout>
