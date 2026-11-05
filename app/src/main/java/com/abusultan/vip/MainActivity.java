@@ -288,8 +288,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         case 1:
                             Intent shareIntent = new Intent(Intent.ACTION_SEND);
                             shareIntent.setType("text/plain");
-                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Max");
-                            shareIntent.putExtra(Intent.EXTRA_TEXT, "Download Max VPN now!");
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "abusultan VIP");
+                            shareIntent.putExtra(Intent.EXTRA_TEXT, "Download the best VPN: abusultan VIP now!");
                             startActivity(Intent.createChooser(shareIntent, "Share App Link"));
                             return true;
                         case 2:

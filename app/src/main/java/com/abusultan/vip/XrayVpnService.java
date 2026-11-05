@@ -86,7 +86,7 @@ public class XrayVpnService extends VpnService {
     private void showNotification(String text) {
         String CHANNEL_ID = "ABUSULTAN_VIP_CHANNEL";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Max", NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "abusultan VIP", NotificationManager.IMPORTANCE_LOW);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) manager.createNotificationChannel(channel);
         }
@@ -103,7 +103,7 @@ public class XrayVpnService extends VpnService {
                 ? new Notification.Builder(this, CHANNEL_ID)
                 : new Notification.Builder(this);
 
-        startForeground(1, builder.setContentTitle("Max")
+        startForeground(1, builder.setContentTitle("abusultan VIP")
                 .setContentText(text)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)

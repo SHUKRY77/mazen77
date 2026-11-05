@@ -55,7 +55,7 @@ public class AdvanceSettingsActivity extends AppCompatActivity {
         // إعداد الشريط العلوي (Toolbar)
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         if (toolbar != null) {
-            toolbar.setTitle("Max");
+            toolbar.setTitle("abusultan VIP");
             toolbar.setSubtitle("Advance Settings");
             toolbar.setBackgroundColor(Color.parseColor("#009688"));
             toolbar.setTitleTextColor(Color.WHITE);

@@ -52,7 +52,7 @@
                         android:id="@+id/app_name_before"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Max"
+                        android:text="abusultan "
                         android:fontFamily="serif" />
                     <TextView
                         android:textSize="17sp"
@@ -62,7 +62,7 @@
                         android:id="@+id/app_name_after"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=""
+                        android:text="VIP"
                         android:fontFamily="serif" />
                 </LinearLayout>
                 <TextView
