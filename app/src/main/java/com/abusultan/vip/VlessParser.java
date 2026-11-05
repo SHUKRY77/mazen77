@@ -76,6 +76,11 @@ public class VlessParser {
             if (type == null || type.isEmpty()) type = "tcp";
             if (host == null) host = "";
             if (path == null || path.isEmpty()) path = "/";
+            // Some panels store WebSocket early-data as "path?ed=...".
+            // Xray expects wsSettings.path without the query suffix.
+            int pathQuery = path.indexOf('?');
+            if (pathQuery >= 0) path = path.substring(0, pathQuery);
+            if (path.isEmpty()) path = "/";
             if (sni == null || sni.isEmpty()) sni = address;
 
             StringBuilder config = new StringBuilder();
