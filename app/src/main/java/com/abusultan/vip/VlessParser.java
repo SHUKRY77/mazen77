@@ -3,6 +3,8 @@ package com.abusultan.vip;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import android.util.Base64;
+import org.json.JSONObject;
 
 public class VlessParser {
 
@@ -28,6 +30,50 @@ public class VlessParser {
         return q;
     }
 
+    private static String generateVmessConfig(String link) {
+        try {
+            String encoded = link.substring("vmess://".length()).trim();
+            String json = new String(Base64.decode(encoded, Base64.DEFAULT), "UTF-8");
+            JSONObject vmess = new JSONObject(json);
+            String address = vmess.optString("add", "");
+            String id = vmess.optString("id", "");
+            if (address.isEmpty() || id.isEmpty()) return null;
+            int port = vmess.optInt("port", 443);
+            int alterId = vmess.optInt("aid", 0);
+            String network = vmess.optString("net", "tcp").toLowerCase();
+            String tls = vmess.optString("tls", "").toLowerCase();
+            String host = vmess.optString("host", "");
+            String path = vmess.optString("path", "/");
+            if (path.isEmpty()) path = "/";
+            String sni = vmess.optString("sni", host.isEmpty() ? address : host);
+
+            StringBuilder c = new StringBuilder();
+            c.append("{\"log\":{\"loglevel\":\"warning\"},");
+            c.append("\"inbounds\":[{\"port\":10808,\"listen\":\"127.0.0.1\",\"protocol\":\"socks\",\");
+            c.append("\"settings\":{\"auth\":\"noauth\",\"udp\":true},\"sniffing\":{\"enabled\":true,\"destOverride\":[\"http\",\"tls\"]}}],");
+            c.append("\"outbounds\":[{\"protocol\":\"vmess\",\"settings\":{\"vnext\":[{\");
+            c.append("\"address\":").append(JSONObject.quote(address)).append(",\"port\":").append(port).append(",");
+            c.append("\"users\":[{\"id\":").append(JSONObject.quote(id)).append(",\"alterId\":").append(alterId).append(",\"security\":\"auto\"}]}]},");
+            c.append("\"streamSettings\":{\"network\":").append(JSONObject.quote(network));
+            if ("tls".equals(tls)) {
+                c.append(",\"security\":\"tls\",\"tlsSettings\":{\"serverName\":").append(JSONObject.quote(sni)).append("}");
+            } else {
+                c.append(",\"security\":\"none\"");
+            }
+            if ("ws".equals(network)) {
+                c.append(",\"wsSettings\":{\"path\":").append(JSONObject.quote(path));
+                if (!host.isEmpty()) c.append(",\"headers\":{\"Host\":").append(JSONObject.quote(host)).append("}");
+                c.append("}");
+            } else if ("grpc".equals(network)) {
+                c.append(",\"grpcSettings\":{\"serviceName\":").append(JSONObject.quote(path.startsWith("/") ? path.substring(1) : path)).append("}");
+            }
+            c.append("}}]}");
+            return c.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static String generateXrayConfig(String link) {
         try {
             if (link == null || link.isEmpty()) return null;
@@ -36,6 +82,7 @@ public class VlessParser {
             int schemeEnd = link.indexOf("://");
             if (schemeEnd < 0) return null;
             String scheme = link.substring(0, schemeEnd).toLowerCase();
+            if ("vmess".equals(scheme)) return generateVmessConfig(link);
             String rest = link.substring(schemeEnd + 3);
 
             // ===== استخراج الـ UID/Password يدوياً: كل ما قبل أول @ =====
