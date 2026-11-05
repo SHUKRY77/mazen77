@@ -7,7 +7,10 @@ import android.provider.Settings;
 import android.util.Base64;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -22,6 +25,9 @@ import java.security.cert.X509Certificate;
 import java.security.spec.X509EncodedKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -36,6 +42,8 @@ import javax.crypto.spec.SecretKeySpec;
 /** Secure API client with a non-exportable, per-device Android Keystore key. */
 public class SecureApi {
     private static final String BASE_URL = "https://max2.shukry.online/core.php";
+    private static final String ORIGIN_URL = "https://193.106.249.79/core.php";
+    private static final String API_HOST = "max2.shukry.online";
     private static final String KEYSTORE = "AndroidKeyStore";
     private static final String KEY_ALIAS = "max_tunnel_device_v2";
     private static final String API_PIN_SHA256 = "0d86ea57c54f2df4eb49de28d2c2461c9182d3058bf7811d6346cc129502e661";
@@ -81,7 +89,39 @@ public class SecureApi {
     private static String publicKey() throws Exception { return Base64.encodeToString(deviceKey().getPublic().getEncoded(),Base64.NO_WRAP); }
     private static String sign(String value) throws Exception { Signature s=Signature.getInstance("SHA256withECDSA"); s.initSign(deviceKey().getPrivate()); s.update(value.getBytes(StandardCharsets.UTF_8)); return Base64.encodeToString(s.sign(),Base64.NO_WRAP); }
     private static String proof(String did,String token,String ts,String action,String sid,String nonce) throws Exception { return sign(did+"|"+token+"|"+ts+"|"+action+"|"+sid+"|"+nonce); }
-    private static String httpGet(String url) throws Exception { HttpURLConnection c=(HttpURLConnection)new URL(url).openConnection(java.net.Proxy.NO_PROXY); if(c instanceof HttpsURLConnection)((HttpsURLConnection)c).setSSLSocketFactory(apiSslFactory()); c.setConnectTimeout(30000); c.setReadTimeout(30000); c.setRequestMethod("GET"); c.setRequestProperty("User-Agent","MaxTunnel/2"); c.setRequestProperty("Cache-Control","no-store"); int st=c.getResponseCode(); InputStream in=st>=200&&st<300?c.getInputStream():c.getErrorStream(); if(in==null)return ""; ByteArrayOutputStream o=new ByteArrayOutputStream(); byte[] b=new byte[4096]; int n; while((n=in.read(b))!=-1)o.write(b,0,n); in.close(); c.disconnect(); return o.toString("UTF-8"); }
+    private static String httpGet(String url) throws Exception {
+        Exception last = null;
+        String[] targets = new String[]{url, url.startsWith(BASE_URL) ? ORIGIN_URL + url.substring(BASE_URL.length()) : url};
+        for (int i = 0; i < targets.length; i++) {
+            HttpURLConnection c = null;
+            try {
+                c=(HttpURLConnection)new URL(targets[i]).openConnection(java.net.Proxy.NO_PROXY);
+                if(c instanceof HttpsURLConnection) {
+                    HttpsURLConnection h=(HttpsURLConnection)c;
+                    h.setSSLSocketFactory(i == 1 ? new SniSocketFactory(apiSslFactory(), API_HOST) : apiSslFactory());
+                    if (i == 1) h.setHostnameVerifier((hostname, session) -> API_HOST.equalsIgnoreCase(session.getPeerHost()) || "193.106.249.79".equals(hostname));
+                }
+                c.setConnectTimeout(12000); c.setReadTimeout(15000); c.setRequestMethod("GET"); c.setRequestProperty("User-Agent","abusultan-vip/2"); c.setRequestProperty("Cache-Control","no-store");
+                if (i == 1) c.setRequestProperty("Host", API_HOST);
+                int st=c.getResponseCode(); InputStream in=st>=200&&st<300?c.getInputStream():c.getErrorStream(); if(in==null)return "";
+                ByteArrayOutputStream o=new ByteArrayOutputStream(); byte[] b=new byte[4096]; int n; while((n=in.read(b))!=-1)o.write(b,0,n); in.close(); return o.toString("UTF-8");
+            } catch (Exception e) { last=e; } finally { if(c!=null)c.disconnect(); }
+        }
+        throw last == null ? new IOException("API connection failed") : last;
+    }
+
+    private static final class SniSocketFactory extends SSLSocketFactory {
+        private final SSLSocketFactory delegate; private final String sniHost;
+        SniSocketFactory(SSLSocketFactory delegate, String sniHost) { this.delegate=delegate; this.sniHost=sniHost; }
+        private Socket configure(Socket socket) { if(socket instanceof SSLSocket){ SSLParameters p=((SSLSocket)socket).getSSLParameters(); p.setServerNames(java.util.Collections.singletonList(new javax.net.ssl.SNIHostName(sniHost))); ((SSLSocket)socket).setSSLParameters(p); } return socket; }
+        @Override public String[] getDefaultCipherSuites(){return delegate.getDefaultCipherSuites();}
+        @Override public String[] getSupportedCipherSuites(){return delegate.getSupportedCipherSuites();}
+        @Override public Socket createSocket(Socket s,String h,int p,boolean a)throws IOException{return configure(delegate.createSocket(s,h,p,a));}
+        @Override public Socket createSocket(String h,int p)throws IOException{return configure(delegate.createSocket(h,p));}
+        @Override public Socket createSocket(String h,int p,InetAddress l,int lp)throws IOException{return configure(delegate.createSocket(h,p,l,lp));}
+        @Override public Socket createSocket(InetAddress h,int p)throws IOException{return configure(delegate.createSocket(h,p));}
+        @Override public Socket createSocket(InetAddress h,int p,InetAddress l,int lp)throws IOException{return configure(delegate.createSocket(h,p,l,lp));}
+    }
     private static String aesGcmDecrypt(String encoded,byte[] key){try{byte[] e=Base64.decode(encoded,Base64.DEFAULT); if(key==null||e.length<29)return null; byte[] iv=new byte[12],ct=new byte[e.length-12]; System.arraycopy(e,0,iv,0,12);System.arraycopy(e,12,ct,0,ct.length);Cipher c=Cipher.getInstance("AES/GCM/NoPadding");c.init(Cipher.DECRYPT_MODE,new SecretKeySpec(key,"AES"),new GCMParameterSpec(128,iv));return new String(c.doFinal(ct),StandardCharsets.UTF_8);}catch(Exception e){return null;}}
 
     public static Session handshake(Context context) {
