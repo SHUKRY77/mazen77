@@ -363,7 +363,11 @@ public class XrayVpnService extends VpnService {
                 }).start();
 
             } catch (Exception e) {
-                sendStateToUI("ERROR", "خطأ في تشغيل النفق: " + e.getMessage());
+                String detail = e.getMessage();
+                if (detail == null || detail.isEmpty()) detail = e.getClass().getSimpleName();
+                if (detail.length() > 160) detail = detail.substring(0, 160);
+                Log.e("VPN-RADAR-XRAY", "Xray startup exception: " + detail);
+                sendStateToUI("ERROR", "خطأ في تشغيل النفق: " + detail);
                 stopVpn();
             }
         }).start();

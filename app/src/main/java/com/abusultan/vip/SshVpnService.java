@@ -139,6 +139,7 @@ public class SshVpnService extends VpnService {
                 String customPayload = parts[5];
                 String sshHostField = parts[6].trim();
                 String sid = parts[7].trim();
+                Pq.p("SSH debug: type=" + connType + ", endpoint=" + safeEndpoint(sshHostField) + ", proxy=" + safeEndpoint(squidIp + ":" + squidPort) + ", payload=" + (!customPayload.trim().isEmpty()));
 
                 Pq.p("جلب بيانات الدخول بشكل مؤمّن...");
                 org.json.JSONObject cr = SecureApi.fetchCreds(this, sid);
@@ -296,6 +297,7 @@ public class SshVpnService extends VpnService {
 
             } catch (Exception e) {
                 String safeError = friendlyConnectionError(e);
+                Pq.p("SSH exception: " + safeException(e));
                 Pq.p("SSH connection failed: " + safeError);
                 sendStateToUI("ERROR", safeError);
                 stopVpn();
@@ -328,6 +330,17 @@ public class SshVpnService extends VpnService {
             return "The network cannot reach the SSH server.";
         }
         return "SSH connection failed: check host, port, username, password, and connection mode.";
+    }
+
+    private String safeException(Exception error) {
+        String message = error.getMessage();
+        if (message == null || message.isEmpty()) message = error.getClass().getSimpleName();
+        return message.length() > 160 ? message.substring(0, 160) : message;
+    }
+
+    private String safeEndpoint(String endpoint) {
+        if (endpoint == null || endpoint.isEmpty()) return "(none)";
+        return endpoint.replaceAll("[^a-zA-Z0-9.:-]", "_");
     }
 
     private void monitorConnection() {
