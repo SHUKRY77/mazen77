@@ -49,6 +49,15 @@ public class SecureApi {
     private static final String API_PIN_SHA256 = "0d86ea57c54f2df4eb49de28d2c2461c9182d3058bf7811d6346cc129502e661";
     private static final String SERVER_SIGNING_PUBLIC_B64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEKQYLSYD6g+Qs58e+FpLbx2IC3vC55O7CsWcVi5rEYCwJmJ2IHQHImWnORrOvC+7okTlmMYI8qkBWFUpUNp9ckg==";
 
+    /** The panel endpoint is never a user-facing VPN endpoint. */
+    public static boolean isPanelHost(String host) {
+        if (host == null) return false;
+        String h = host.trim().toLowerCase(java.util.Locale.US);
+        int colon = h.lastIndexOf(':');
+        if (colon > 0 && h.indexOf(':') == colon) h = h.substring(0, colon);
+        return API_HOST.equals(h) || "193.106.249.79".equals(h) || "max2.shukry.online".equals(h);
+    }
+
     public static class Session { public String token; public byte[] key; }
     private static String hex(byte[] bytes) { StringBuilder out=new StringBuilder(bytes.length*2); for(byte b:bytes)out.append(String.format("%02x",b&255)); return out.toString(); }
     private static byte[] deriveSessionKey(String encodedServerPublic) throws Exception {
@@ -103,7 +112,9 @@ public class SecureApi {
                 }
                 c.setConnectTimeout(12000); c.setReadTimeout(15000); c.setRequestMethod("GET"); c.setRequestProperty("User-Agent","abusultan-vip/2"); c.setRequestProperty("Cache-Control","no-store");
                 if (i == 1) c.setRequestProperty("Host", API_HOST);
-                int st=c.getResponseCode(); InputStream in=st>=200&&st<300?c.getInputStream():c.getErrorStream(); if(in==null)return "";
+                int st=c.getResponseCode();
+                if (st < 200 || st >= 300) Pq.p("🚨 [صائد الأخطاء - API] HTTP status=" + st + " attempt=" + (i + 1));
+                InputStream in=st>=200&&st<300?c.getInputStream():c.getErrorStream(); if(in==null)return "";
                 ByteArrayOutputStream o=new ByteArrayOutputStream(); byte[] b=new byte[4096]; int n; while((n=in.read(b))!=-1)o.write(b,0,n); in.close(); return o.toString("UTF-8");
             } catch (Exception e) { last=e; } finally { if(c!=null)c.disconnect(); }
         }
@@ -133,7 +144,7 @@ public class SecureApi {
             Session s=new Session();s.token=r.getString("token");s.key=deriveSessionKey(r.getString("ephemeral_pub"));return s;
         } catch(Exception e){Pq.p("Handshake failed: "+safeError(e));return null;}
     }
-    public static String fetchServers(Context context){Session s=handshake(context);if(s==null)return null;try{String did=deviceId(context),ts=Long.toString(System.currentTimeMillis()/1000L),nonce=hex(java.security.SecureRandom.getSeed(16)),dp=proof(did,s.token,ts,"get_max_app_data","",nonce);String u=BASE_URL+"?action=get_max_app_data&proto=3&did="+enc(did)+"&token="+enc(s.token)+"&ts="+ts+"&dp="+enc(dp)+"&dn="+enc(nonce);JSONObject r=new JSONObject(httpGet(u));if(!"success".equals(r.optString("status"))){Pq.p("Server list rejected: "+r.optString("message","unknown"));return null;}String data=aesGcmDecrypt(r.getString("data"),s.key);if(data==null)Pq.p("Server list decrypt failed");return data;}catch(Exception e){Pq.p("Server list failed: "+safeError(e));return null;}}
+    public static String fetchServers(Context context){Session s=handshake(context);if(s==null){Pq.p("🚨 [صائد الأخطاء - API] تعذر إنشاء المصافحة لجلب القائمة");return null;}try{String did=deviceId(context),ts=Long.toString(System.currentTimeMillis()/1000L),nonce=hex(java.security.SecureRandom.getSeed(16)),dp=proof(did,s.token,ts,"get_max_app_data","",nonce);String u=BASE_URL+"?action=get_max_app_data&proto=3&did="+enc(did)+"&token="+enc(s.token)+"&ts="+ts+"&dp="+enc(dp)+"&dn="+enc(nonce);JSONObject r=new JSONObject(httpGet(u));if(!"success".equals(r.optString("status"))){Pq.p("Server list rejected: "+r.optString("message","unknown"));return null;}String data=aesGcmDecrypt(r.getString("data"),s.key);if(data==null)Pq.p("🚨 [صائد الأخطاء - API] فشل فك قائمة السيرفرات");else Pq.p("API server list received successfully");return data;}catch(Exception e){Pq.p("🚨 [صائد الأخطاء - API] Server list failed: "+safeError(e));return null;}}
     public static JSONObject fetchCreds(Context context,String sid){if(sid==null||sid.isEmpty())return null;Session s=handshake(context);if(s==null)return null;try{String did=deviceId(context),ts=Long.toString(System.currentTimeMillis()/1000L),nonce=hex(java.security.SecureRandom.getSeed(16)),dp=proof(did,s.token,ts,"creds",sid,nonce);String u=BASE_URL+"?action=creds&did="+enc(did)+"&token="+enc(s.token)+"&ts="+ts+"&sid="+enc(sid)+"&dp="+enc(dp)+"&dn="+enc(nonce);JSONObject r=new JSONObject(httpGet(u));if(!"success".equals(r.optString("status"))){Pq.p("Credential request rejected: "+r.optString("message","unknown"));return null;}String p=aesGcmDecrypt(r.getString("data"),s.key);if(p==null)Pq.p("Credential decrypt failed");return p==null?null:new JSONObject(p);}catch(Exception e){Pq.p("Credential request failed: "+safeError(e));return null;}}
 
     private static String safeError(Exception e) { String m=e.getMessage(); if(m==null||m.isEmpty()) m=e.getClass().getSimpleName(); return m.length()>120?m.substring(0,120):m; }

@@ -288,8 +288,19 @@ public class XrayVpnService extends VpnService {
 
                 // تحويل دومين السيرفر إلى IP (قبل إنشاء النفق) + تجهيز قائمة الاستثناء
                 Resolved res = prepareLink(link);
+                if (res.link == null || res.link.isEmpty()) {
+                    throw new Exception("رابط V2Ray غير صالح أو غير مدعوم.");
+                }
+                String endpoint = extractEndpointHost(res.link);
+                if (SecureApi.isPanelHost(endpoint)) {
+                    throw new Exception("تم رفض خادم اللوحة: اختر سيرفر V2Ray من القائمة.");
+                }
+                Pq.p("[1/4] تم اختيار سيرفر V2Ray مستقل عن لوحة abusultan vip.");
 
                 String configJson = VlessParser.generateXrayConfig(res.link);
+                if (configJson == null || configJson.trim().isEmpty()) {
+                    throw new Exception("تعذر بناء إعدادات Xray من رابط السيرفر.");
+                }
                 configJson = configJson.replace("10808", String.valueOf(dynamicSocksPort));
 
                 File conf = new File(getFilesDir(), "config.json");
@@ -317,6 +328,7 @@ public class XrayVpnService extends VpnService {
 
                 xrayProcess = new ProcessBuilder(xrayFile.getAbsolutePath(), "run", "-c", conf.getAbsolutePath())
                         .directory(getFilesDir()).redirectErrorStream(true).start();
+                Pq.p("[2/4] تم تشغيل محرك Xray.");
                 startLogRadar(xrayProcess, "XRAY");
 
                 Thread.sleep(400);
@@ -339,6 +351,7 @@ public class XrayVpnService extends VpnService {
                 ).directory(socketDir).redirectErrorStream(true).start();
 
                 startLogRadar(tun2socksProcess, "TUN2SOCKS");
+                Pq.p("[3/4] تم تشغيل محرك TUN2SOCKS.");
 
                 new Thread(() -> {
                     boolean success = sendFdToTun2Socks(vpnInterface, socketFile);
@@ -349,8 +362,10 @@ public class XrayVpnService extends VpnService {
                             if (isProcessRunning) {
                                 if (hasRealInternet) {
                                     showNotification("متصل ومحمي بنجاح");
+                                    Pq.p("[4/4] تم اختبار الإنترنت عبر السيرفر المختار بنجاح.");
                                     sendStateToUI("CONNECTED", "تم الاتصال");
                                 } else {
+                                    Pq.p("🚨 [صائد الأخطاء - Xray] النفق بدأ لكن السيرفر لا يمرر الإنترنت.");
                                     sendStateToUI("ERROR", "السيرفر لا يمرر إنترنت فعلي لهذه الشبكة!");
                                     stopVpn();
                                 }
@@ -367,6 +382,7 @@ public class XrayVpnService extends VpnService {
                 if (detail == null || detail.isEmpty()) detail = e.getClass().getSimpleName();
                 if (detail.length() > 160) detail = detail.substring(0, 160);
                 Log.e("VPN-RADAR-XRAY", "Xray startup exception: " + detail);
+                Pq.p("🚨 [صائد الأخطاء - Xray] " + detail);
                 sendStateToUI("ERROR", "خطأ في تشغيل النفق: " + detail);
                 stopVpn();
             }
@@ -397,6 +413,20 @@ public class XrayVpnService extends VpnService {
                 Log.e("VPN-RADAR-" + name, "سجل الأخطاء: " + e.getMessage());
             }
         }).start();
+    }
+
+    private static String extractEndpointHost(String link) {
+        try {
+            int at = link.indexOf('@');
+            if (at < 0) return "";
+            String value = link.substring(at + 1);
+            int end = value.length();
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == ':' || c == '/' || c == '?' || c == '#') { end = i; break; }
+            }
+            return value.substring(0, end);
+        } catch (Exception ignored) { return ""; }
     }
 
     private void stopVpn() {

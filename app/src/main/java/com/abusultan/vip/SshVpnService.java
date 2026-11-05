@@ -141,7 +141,13 @@ public class SshVpnService extends VpnService {
                 String sid = parts[7].trim();
                 Pq.p("SSH debug: type=" + connType + ", endpoint=" + safeEndpoint(sshHostField) + ", proxy=" + safeEndpoint(squidIp + ":" + squidPort) + ", payload=" + (!customPayload.trim().isEmpty()));
 
-                Pq.p("جلب بيانات الدخول بشكل مؤمّن...");
+                if (sshHostField.isEmpty()) throw new Exception("إعداد السيرفر لا يحتوي على عنوان تشغيل.");
+                if (SecureApi.isPanelHost(sshHostField)) {
+                    Pq.p("🚨 [عزل اللوحة] تم رفض تشغيل عنوان لوحة abusultan vip كنفق SSH");
+                    throw new Exception("تم رفض خادم اللوحة: اختر سيرفر SSH من القائمة.");
+                }
+
+                Pq.p("[1/4] جلب بيانات دخول السيرفر المختار بشكل مؤمّن...");
                 org.json.JSONObject cr = SecureApi.fetchCreds(this, sid);
                 if (cr == null || !cr.has("user") || !cr.has("pass")) {
                     throw new Exception("فشل جلب بيانات السيرفر المؤمّنة (تحقّق من الاتصال).");
@@ -202,9 +208,9 @@ public class SshVpnService extends VpnService {
                     sshSession.setProxy(new CloudflareWsProxy(squidIp, squidPort, sni, customPayload, sshHostOnly));
                 }
 
-                Pq.p("Authenticating...");
+                Pq.p("[2/4] الاتصال بعنوان السيرفر المختار وليس عنوان اللوحة...");
                 sshSession.connect(20000);
-                Pq.p("Authentication successful.");
+                Pq.p("[3/4] تمت مصادقة SSH بنجاح.");
 
                 Pq.p("Starting local proxy routing...");
                 startLocalSocksServer(sshSession, 10808);
@@ -283,7 +289,7 @@ public class SshVpnService extends VpnService {
                 }
 
                 if (fdSent) {
-                    Pq.p("Connection established.");
+                    Pq.p("[4/4] تم تشغيل نفق SSH وربط واجهة الشبكة.");
                     handler.post(() -> {
                         if (isProcessRunning) {
                             showNotification("Connected");
@@ -297,7 +303,7 @@ public class SshVpnService extends VpnService {
 
             } catch (Exception e) {
                 String safeError = friendlyConnectionError(e);
-                Pq.p("SSH exception: " + safeException(e));
+                Pq.p("🚨 [صائد الأخطاء - SSH] " + safeException(e));
                 Pq.p("SSH connection failed: " + safeError);
                 sendStateToUI("ERROR", safeError);
                 stopVpn();
