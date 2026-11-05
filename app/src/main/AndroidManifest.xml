@@ -23,7 +23,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
 
-        <!-- تم تعطيل معرّف الإعلانات مؤقتًا؛ لا توجد تهيئة إعلانات عند بدء التطبيق. -->
+        <!-- معرّف AdMob التجريبي الرسمي من Google، وليس معرّفًا إنتاجيًا. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
 
         <activity
             android:name=".MainActivity"

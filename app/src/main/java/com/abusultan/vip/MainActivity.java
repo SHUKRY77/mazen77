@@ -192,6 +192,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         prefs = getSharedPreferences("vpn_settings_data", Context.MODE_PRIVATE);
 
+        // Google test ads only. Replace test unit IDs before production release.
+        try {
+            MobileAds.initialize(this, initializationStatus -> {});
+            loadInterstitialAd();
+            loadRewardedAd();
+        } catch (Exception e) {
+            Pq.p("Ad SDK initialization skipped: " + e.getMessage());
+        }
+
         ac_xp = findViewById(R.id.ac_xp);
 
         boolean isFirstRun = prefs.getBoolean("is_first_run", true);
@@ -401,7 +410,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void loadInterstitialAd() { mInterstitialAd = null; }
+    private void loadInterstitialAd() {
+        mInterstitialAd = null;
+        try {
+            InterstitialAd.load(this, "ca-app-pub-3940256099942544/1033173712",
+                    new AdRequest.Builder().build(), new InterstitialAdLoadCallback() {
+                        @Override public void onAdLoaded(@NonNull InterstitialAd ad) { mInterstitialAd = ad; }
+                        @Override public void onAdFailedToLoad(@NonNull LoadAdError error) { mInterstitialAd = null; }
+                    });
+        } catch (Exception e) { mInterstitialAd = null; }
+    }
 
     private void saveServersToFile(String encryptedData) {
         try {
@@ -535,7 +553,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }).start();
     }
 
-    private void loadRewardedAd() { rewardedAd = null; }
+    private void loadRewardedAd() {
+        rewardedAd = null;
+        try {
+            RewardedAd.load(this, "ca-app-pub-3940256099942544/5224354917",
+                    new AdRequest.Builder().build(), new RewardedAdLoadCallback() {
+                        @Override public void onAdLoaded(@NonNull RewardedAd ad) { rewardedAd = ad; }
+                        @Override public void onAdFailedToLoad(@NonNull LoadAdError error) { rewardedAd = null; }
+                    });
+        } catch (Exception e) { rewardedAd = null; }
+    }
 
     private String getArabicAdError(int errorCode) {
         switch (errorCode) {
