@@ -211,6 +211,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (btnAddTime != null) btnAddTime.setOnClickListener(v -> showManualAdDialog());
 
         tempSelectedColor = prefs.getString("theme_color_hex", "#009688");
+        try {
+            Color.parseColor(tempSelectedColor);
+        } catch (Exception ignored) {
+            tempSelectedColor = "#009688";
+            prefs.edit().putString("theme_color_hex", tempSelectedColor).apply();
+        }
         selectedServerName = prefs.getString("selectedServerName", "Auto select servers");
         selectedServerLink = prefs.getString("selectedServerLink", "");
         selectedServerSubtitle = prefs.getString("selectedServerSubtitle", "Smart Premium Selection");
@@ -246,9 +252,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (circleProgress != null) {
             circleProgress.setVisibility(View.VISIBLE);
             circleProgress.setProgress(0f);
-            circleProgress.setColor(Color.parseColor(tempSelectedColor));
+            try { circleProgress.setColor(Color.parseColor(tempSelectedColor)); } catch (Exception ignored) {}
         }
-        if (mRotateLoading != null) mRotateLoading.setColor(Color.parseColor(tempSelectedColor));
+        if (mRotateLoading != null) {
+            try { mRotateLoading.setColor(Color.parseColor(tempSelectedColor)); } catch (Exception ignored) {}
+        }
         if (drawerNavigationView != null) drawerNavigationView.setNavigationItemSelectedListener(this);
         ImageView mDrawerMenu = findViewById(R.id.mDrawerMenu);
         if (mDrawerMenu != null) mDrawerMenu.setOnClickListener(v -> {

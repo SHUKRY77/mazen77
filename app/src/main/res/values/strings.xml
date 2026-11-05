@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">abusultan VIP</string>
+    <string name="app_name">abusultan vip</string>
     <string name="app_copyright">All Rights Reserved</string>
 
     <string name="app_name_before">abusultan </string>
-    <string name="app_name_after">VIP</string>
+    <string name="app_name_after">vip</string>
 
     <string name="title_tethering_subnet">Tethering Subnet</string>
     <string name="summary_tethering_subnet">Set subnet for hotspot sharing</string>
