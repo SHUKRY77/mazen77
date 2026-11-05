@@ -41,9 +41,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 /** Secure API client with a non-exportable, per-device Android Keystore key. */
 public class SecureApi {
-    private static final String BASE_URL = "https://max2.shukry.online/core.php";
+    private static final String BASE_URL = "https://abusultan.shukry.online/core.php";
     private static final String ORIGIN_URL = "https://193.106.249.79/core.php";
-    private static final String API_HOST = "max2.shukry.online";
+    private static final String API_HOST = "abusultan.shukry.online";
     private static final String KEYSTORE = "AndroidKeyStore";
     private static final String KEY_ALIAS = "max_tunnel_device_v2";
     private static final String API_PIN_SHA256 = "0d86ea57c54f2df4eb49de28d2c2461c9182d3058bf7811d6346cc129502e661";
