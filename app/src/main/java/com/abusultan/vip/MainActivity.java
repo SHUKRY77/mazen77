@@ -1380,7 +1380,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                             boolean exists = false;
                             for (ServerData sd : serverDataList) {
-                                if (sd.name.equals(name)) { exists = true; break; }
+                                if (sd.name.equals(name) && sd.link.equals(link)) { exists = true; break; }
                             }
                             if (!exists) serverDataList.add(new ServerData(name, link, displaySubtitle));
                         }
@@ -1412,7 +1412,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                             boolean exists = false;
                             for (ServerData sd : serverDataList) {
-                                if (sd.name.equals(name)) { exists = true; break; }
+                                if (sd.name.equals(name) && sd.link.equals(link)) { exists = true; break; }
                             }
                             if (!exists) serverDataList.add(new ServerData(name, link, subtitle));
                         }
