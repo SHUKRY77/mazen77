@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String selectedPayloadName = "Select Network Payload";
     private String selectedPayloadLink = "";
     private String selectedPayloadSubtitle = "V2Ray / SSH Network";
+    private boolean refreshingServerSelection = false;
 
     private float currentConfigVersion = 5.4f;
 
@@ -1343,6 +1344,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void showSelectionDialog(final String type) {
+        if (type.equals("Servers") && !refreshingServerSelection) {
+            refreshingServerSelection = true;
+            Toast.makeText(this, "جاري جلب السيرفرات من لوحة abusultan vip...", Toast.LENGTH_SHORT).show();
+            new Thread(() -> {
+                String fetched = null;
+                try { fetched = SecureApi.fetchServers(MainActivity.this); } catch (Exception e) { Pq.p("Server refresh failed: " + e.getMessage()); }
+                final String result = fetched;
+                runOnUiThread(() -> {
+                    if (result != null && !result.trim().isEmpty() && result.trim().startsWith("[")) {
+                        saveServersToFile(result);
+                        refreshingServerSelection = true;
+                        showSelectionDialog("Servers");
+                        refreshingServerSelection = false;
+                    } else {
+                        refreshingServerSelection = false;
+                        Toast.makeText(this, "تعذر جلب السيرفرات من لوحة abusultan vip. افتح سجل الأخطاء.", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }).start();
+            return;
+        }
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_selection_list);
         if (dialog.getWindow() != null) {
