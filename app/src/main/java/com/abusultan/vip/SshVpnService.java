@@ -179,7 +179,12 @@ public class SshVpnService extends VpnService {
 
                 // تم تفعيل Direct SSH و SSH UDP للعمل مباشرة وبأقل زمن تأخير
                 if (connType.equals(CONN_TYPE_DIRECT)) {
-                    Pq.p("وضع الاتصال: SSH Direct");
+                    if (!customPayload.trim().isEmpty()) {
+                        Pq.p("وضع الاتصال: SSH Direct + Payload");
+                        sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.DIRECT, "", 0, sni, customPayload, sshHostOnly, sshPort));
+                    } else {
+                        Pq.p("وضع الاتصال: SSH Direct");
+                    }
                 } else if (connType.equals(CONN_TYPE_UDP)) {
                     Pq.p("وضع الاتصال: SSH UDP / BadVPN");
                 } else if (connType.equals(CONN_TYPE_PAYLOAD)) {
