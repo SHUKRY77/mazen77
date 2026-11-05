@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Collections;
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLParameters;
@@ -95,8 +96,14 @@ public final class PayloadSocketProxy implements Proxy {
 
     private void sendPayload(String host) throws Exception {
         if (payload.trim().isEmpty()) return;
+        String deliveryHost = sni == null || sni.trim().isEmpty() ? host : sni.trim();
+        String hostPort = host + ":" + targetPort;
+        String random16 = randomToken(16);
         String text = payload.replace("[crlf]", "\r\n").replace("[cr]", "\r")
                 .replace("[lf]", "\n").replace("[host]", host)
+                .replace("[host_delivery]", deliveryHost)
+                .replace("[host_port]", hostPort)
+                .replace("[random=16]", random16)
                 .replace("[sni]", sni == null ? "" : sni)
                 .replace("[protocol]", "HTTP/1.1")
                 .replace("[ua]", "Dalvik/2.1.0 (Linux; Android)");
@@ -107,6 +114,14 @@ public final class PayloadSocketProxy implements Proxy {
             if (!(response.contains(" 200 ") || response.contains(" 101 ") || response.contains(" 2")))
                 throw new Exception("Payload rejected: " + response.trim());
         }
+    }
+
+    private static String randomToken(int length) {
+        final char[] alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+        SecureRandom random = new SecureRandom();
+        StringBuilder out = new StringBuilder(length);
+        for (int i = 0; i < length; i++) out.append(alphabet[random.nextInt(alphabet.length)]);
+        return out.toString();
     }
 
     private String readHeaders() throws Exception {
