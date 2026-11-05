@@ -235,6 +235,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         selectedPayloadSubtitle = prefs.getString("selectedPayloadSubtitle", "V2Ray / SSH Network");
         currentConfigVersion = prefs.getFloat("config_version", 5.4f);
 
+        // A previous APK could have cached a list from the retired panel. Never
+        // display that list after switching the sole app source to abusultan.
+        String serverSource = "abusultan.shukry.online";
+        if (!serverSource.equals(prefs.getString("server_source", ""))) {
+            deleteFile("secure_servers.dat");
+            prefs.edit().putString("server_source", serverSource)
+                    .putString("selectedServerName", "Auto select servers")
+                    .putString("selectedServerLink", "")
+                    .putString("selectedServerSubtitle", "Smart Premium Selection")
+                    .putString("selectedPayloadName", "Select Network Payload")
+                    .putString("selectedPayloadLink", "")
+                    .putString("selectedPayloadSubtitle", "V2Ray / SSH Network")
+                    .apply();
+            selectedServerName = "Auto select servers";
+            selectedServerLink = "";
+            selectedServerSubtitle = "Smart Premium Selection";
+            selectedPayloadName = "Select Network Payload";
+            selectedPayloadLink = "";
+            selectedPayloadSubtitle = "V2Ray / SSH Network";
+        }
         String cachedJson = readServersFromFile();
         if (!cachedJson.isEmpty()) {
              parseAndSaveConfigVersion(cachedJson);
