@@ -42,7 +42,6 @@ import javax.crypto.spec.SecretKeySpec;
 /** Secure API client with a non-exportable, per-device Android Keystore key. */
 public class SecureApi {
     private static final String BASE_URL = "https://abusultan.shukry.online/core.php";
-    private static final String ORIGIN_URL = "https://193.106.249.79/core.php";
     private static final String API_HOST = "abusultan.shukry.online";
     private static final String KEYSTORE = "AndroidKeyStore";
     private static final String KEY_ALIAS = "max_tunnel_device_v2";
@@ -55,7 +54,7 @@ public class SecureApi {
         String h = host.trim().toLowerCase(java.util.Locale.US);
         int colon = h.lastIndexOf(':');
         if (colon > 0 && h.indexOf(':') == colon) h = h.substring(0, colon);
-        return API_HOST.equals(h) || "193.106.249.79".equals(h) || "max2.shukry.online".equals(h);
+        return API_HOST.equals(h) || "193.106.249.79".equals(h);
     }
 
     public static class Session { public String token; public byte[] key; }
@@ -100,18 +99,16 @@ public class SecureApi {
     private static String proof(String did,String token,String ts,String action,String sid,String nonce) throws Exception { return sign(did+"|"+token+"|"+ts+"|"+action+"|"+sid+"|"+nonce); }
     private static String httpGet(String url) throws Exception {
         Exception last = null;
-        String[] targets = new String[]{url, url.startsWith(BASE_URL) ? ORIGIN_URL + url.substring(BASE_URL.length()) : url};
+        String[] targets = new String[]{url};
         for (int i = 0; i < targets.length; i++) {
             HttpURLConnection c = null;
             try {
                 c=(HttpURLConnection)new URL(targets[i]).openConnection(java.net.Proxy.NO_PROXY);
                 if(c instanceof HttpsURLConnection) {
                     HttpsURLConnection h=(HttpsURLConnection)c;
-                    h.setSSLSocketFactory(i == 1 ? new SniSocketFactory(apiSslFactory(), API_HOST) : apiSslFactory());
-                    if (i == 1) h.setHostnameVerifier((hostname, session) -> API_HOST.equalsIgnoreCase(session.getPeerHost()) || "193.106.249.79".equals(hostname));
+                    h.setSSLSocketFactory(apiSslFactory());
                 }
                 c.setConnectTimeout(12000); c.setReadTimeout(15000); c.setRequestMethod("GET"); c.setRequestProperty("User-Agent","abusultan-vip/2"); c.setRequestProperty("Cache-Control","no-store");
-                if (i == 1) c.setRequestProperty("Host", API_HOST);
                 int st=c.getResponseCode();
                 if (st < 200 || st >= 300) Pq.p("🚨 [صائد الأخطاء - API] HTTP status=" + st + " attempt=" + (i + 1));
                 InputStream in=st>=200&&st<300?c.getInputStream():c.getErrorStream(); if(in==null)return "";

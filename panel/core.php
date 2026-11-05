@@ -37,7 +37,7 @@ if (!$session) json_out(['status'=>'error','message'=>'Session expired'], 401);
 if ($devicePub !== '' && !hash_equals((string)$session['device_pub'], $devicePub)) json_out(['status'=>'error','message'=>'Device binding rejected'], 403);
 if ($action === 'get_max_app_data') {
     if (!consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|get_max_app_data||'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
-    $rows = db()->query("SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config FROM servers WHERE active=1 AND lower(host) NOT IN ('193.106.249.79','max2.shukry.online','abusultan.shukry.online') ORDER BY country,id")->fetchAll();
+    $rows = db()->query("SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config FROM servers WHERE active=1 AND lower(host) NOT IN ('193.106.249.79','abusultan.shukry.online') ORDER BY country,id")->fetchAll();
     foreach ($rows as &$row) {
         if (str_starts_with((string)$row['protocol'], 'ssh') || $row['protocol'] === 'dnstt') {
             $type = match ($row['protocol']) {
