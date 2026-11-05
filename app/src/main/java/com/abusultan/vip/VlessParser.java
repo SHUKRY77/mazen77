@@ -49,9 +49,9 @@ public class VlessParser {
 
             StringBuilder c = new StringBuilder();
             c.append("{\"log\":{\"loglevel\":\"warning\"},");
-            c.append("\"inbounds\":[{\"port\":10808,\"listen\":\"127.0.0.1\",\"protocol\":\"socks\",\");
+            c.append("\"inbounds\":[{\"port\":10808,\"listen\":\"127.0.0.1\",\"protocol\":\"socks\",");
             c.append("\"settings\":{\"auth\":\"noauth\",\"udp\":true},\"sniffing\":{\"enabled\":true,\"destOverride\":[\"http\",\"tls\"]}}],");
-            c.append("\"outbounds\":[{\"protocol\":\"vmess\",\"settings\":{\"vnext\":[{\");
+            c.append("\"outbounds\":[{\"protocol\":\"vmess\",\"settings\":{\"vnext\":[{");
             c.append("\"address\":").append(JSONObject.quote(address)).append(",\"port\":").append(port).append(",");
             c.append("\"users\":[{\"id\":").append(JSONObject.quote(id)).append(",\"alterId\":").append(alterId).append(",\"security\":\"auto\"}]}]},");
             c.append("\"streamSettings\":{\"network\":").append(JSONObject.quote(network));
