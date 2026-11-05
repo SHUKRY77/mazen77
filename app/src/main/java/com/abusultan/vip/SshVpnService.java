@@ -295,10 +295,39 @@ public class SshVpnService extends VpnService {
                 }
 
             } catch (Exception e) {
-                sendStateToUI("ERROR", e.getMessage());
+                String safeError = friendlyConnectionError(e);
+                Pq.p("SSH connection failed: " + safeError);
+                sendStateToUI("ERROR", safeError);
                 stopVpn();
             }
         }).start();
+    }
+
+    private String friendlyConnectionError(Exception error) {
+        StringBuilder text = new StringBuilder();
+        Throwable current = error;
+        while (current != null) {
+            if (current.getMessage() != null) text.append(' ').append(current.getMessage());
+            current = current.getCause();
+        }
+        String raw = text.toString();
+        String lower = raw.toLowerCase(java.util.Locale.US);
+        if (lower.contains("auth fail") || lower.contains("authentication")) {
+            return "SSH authentication failed: check username and password in the panel.";
+        }
+        if (lower.contains("connection refused")) {
+            return "SSH port refused the connection: check host, port, and SSH service.";
+        }
+        if (lower.contains("unknownhost") || lower.contains("unknown host")) {
+            return "SSH host could not be resolved: check the server host.";
+        }
+        if (lower.contains("timeout") || lower.contains("timed out")) {
+            return "SSH connection timed out: check firewall, port, and proxy settings.";
+        }
+        if (lower.contains("no route") || lower.contains("network is unreachable")) {
+            return "The network cannot reach the SSH server.";
+        }
+        return "SSH connection failed: check host, port, username, password, and connection mode.";
     }
 
     private void monitorConnection() {
