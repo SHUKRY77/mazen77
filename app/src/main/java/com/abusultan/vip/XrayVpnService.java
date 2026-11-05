@@ -397,6 +397,11 @@ public class XrayVpnService extends VpnService {
                 StringBuilder fullLog = new StringBuilder();
                 while ((line = reader.readLine()) != null) {
                     Log.e("VPN-RADAR-" + name, line);
+                    if (line != null && !line.trim().isEmpty()) {
+                        String visible = line.trim();
+                        if (visible.length() > 220) visible = visible.substring(visible.length() - 220);
+                        Pq.p("🚨 [" + name + "] " + visible);
+                    }
                     fullLog.append(line).append("\n");
                 }
                 int exitCode = process.waitFor();
