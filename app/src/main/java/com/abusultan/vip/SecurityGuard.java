@@ -22,7 +22,10 @@ public class SecurityGuard {
     // ثم انسخ قيمة SHA256 واحذف النقطتين (:) واجعلها أحرفاً صغيرة.
     // اتركها فارغة "" أثناء التطوير (يسمح بأي توقيع) ثم املأها قبل النشر.
     // ========================================================
-    private static final String EXPECTED_SIG_SHA256 = "e51aad6110920a864893f97cde2b5048f99d9ce7ee266bac9f5fdd6303149845";
+    // مؤقتًا أثناء التشخيص: نسخة GitHub الحالية قد تُوقّع بمفتاح مختلف،
+    // وفشل هذا الفحص كان يغلق التطبيق فورًا عند أول تشغيل.
+    // أعد وضع بصمة release الصحيحة قبل نشر APK النهائي.
+    private static final String EXPECTED_SIG_SHA256 = "";
 
     // يرجّع بصمة SHA-256 لشهادة توقيع التطبيق الحالي (hex صغير)
     public static String getAppSignatureSha256(Context ctx) {

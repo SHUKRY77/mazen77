@@ -23,12 +23,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
 
-        <!-- 🌟 إضافة معرف تطبيق Start.io الخاص بـ abusultan VIP 🌟 -->
-        <meta-data
-            android:name="com.startapp.sdk.APPLICATION_ID"
-            android:value="208638219" />
-
-        <!-- ملاحظة: إعلانات Unity لا تحتاج إلى Meta-data هنا، بل سيتم تفعيلها داخل ملفات الجافا -->
+        <!-- تم تعطيل معرّف الإعلانات مؤقتًا؛ لا توجد تهيئة إعلانات عند بدء التطبيق. -->
 
         <activity
             android:name=".MainActivity"
