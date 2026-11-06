@@ -441,34 +441,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /** Never keep or run a server link that is absent from the latest panel response. */
+    /** Never keep or run a server or payload link absent from the latest panel response. */
     private void clearStaleServerSelection(String json) {
-        if (selectedServerLink == null || selectedServerLink.isEmpty()) return;
-        boolean found = false;
+        boolean serverFound = selectedServerLink == null || selectedServerLink.isEmpty();
+        boolean payloadFound = selectedPayloadLink == null || selectedPayloadLink.isEmpty();
         try {
             JSONArray array = new JSONArray(json == null || json.trim().isEmpty() ? "[]" : json);
             for (int i = 0; i < array.length(); i++) {
                 JSONObject item = array.optJSONObject(i);
                 if (item == null) continue;
                 String link = decryptSafe(item.optString("config", ""));
-                if (selectedServerLink.equals(link)) {
-                    found = true;
-                    break;
-                }
+                if (!serverFound && selectedServerLink.equals(link)) serverFound = true;
+                if (!payloadFound && selectedPayloadLink.equals(link)) payloadFound = true;
+                if (serverFound && payloadFound) break;
             }
         } catch (Exception ignored) {}
-        if (!found) {
+        android.content.SharedPreferences.Editor editor = prefs.edit();
+        if (!serverFound) {
             Pq.p("[تحديث اللوحة] تم مسح اختيار سيرفر قديم غير موجود في القائمة الحالية.");
             selectedServerName = "Auto select servers";
             selectedServerLink = "";
             selectedServerSubtitle = "Smart Premium Selection";
-            prefs.edit().putString("selectedServerName", selectedServerName)
+            editor.putString("selectedServerName", selectedServerName)
                     .putString("selectedServerLink", "")
-                    .putString("selectedServerSubtitle", selectedServerSubtitle)
-                    .apply();
+                    .putString("selectedServerSubtitle", selectedServerSubtitle);
         }
+        if (!payloadFound) {
+            Pq.p("[تحديث اللوحة] تم مسح اختيار Payload قديم غير موجود في القائمة الحالية.");
+            selectedPayloadName = "Select Network Payload";
+            selectedPayloadLink = "";
+            selectedPayloadSubtitle = "V2Ray / SSH Network";
+            editor.putString("selectedPayloadName", selectedPayloadName)
+                    .putString("selectedPayloadLink", "")
+                    .putString("selectedPayloadSubtitle", selectedPayloadSubtitle);
+        }
+        editor.apply();
     }
-
     private String readServersFromFile() {
         try {
             FileInputStream fis = openFileInput("secure_servers.dat");
