@@ -34,7 +34,7 @@ function db(): PDO {
     $pdo->exec('CREATE TABLE IF NOT EXISTS request_nonces (token TEXT NOT NULL, nonce TEXT NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(token,nonce))');
     $pdo->exec('CREATE TABLE IF NOT EXISTS payloads (id TEXT PRIMARY KEY, network TEXT NOT NULL, subtitle TEXT NOT NULL, config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
     foreach ([
-        'target_app TEXT NOT NULL DEFAULT "Max Tunnel"',
+        'target_app TEXT NOT NULL DEFAULT "abusultan vip"',
         'carrier TEXT NOT NULL DEFAULT ""',
         'tls INTEGER NOT NULL DEFAULT 0',
         'tls_version TEXT NOT NULL DEFAULT "default"',
