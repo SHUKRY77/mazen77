@@ -70,6 +70,7 @@ import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
@@ -561,23 +562,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         new Thread(() -> {
             long rtt = -1;
             try {
+                int socksPort = getSharedPreferences("vpn_settings_data", MODE_PRIVATE)
+                        .getInt("current_socks_port", 10808);
                 long start = System.currentTimeMillis();
-                Socket socket = new Socket();
-                socket.connect(new InetSocketAddress("1.1.1.1", 53), 2000);
-                rtt = System.currentTimeMillis() - start;
-                socket.close();
+                Proxy proxy = new Proxy(Proxy.Type.SOCKS,
+                        new InetSocketAddress("127.0.0.1", socksPort));
+                HttpURLConnection conn = (HttpURLConnection)
+                        new URL("https://cp.cloudflare.com/generate_204").openConnection(proxy);
+                conn.setConnectTimeout(3000);
+                conn.setReadTimeout(3000);
+                conn.setUseCaches(false);
+                conn.setInstanceFollowRedirects(false);
+                int code = conn.getResponseCode();
+                if (code >= 200 && code < 400) rtt = System.currentTimeMillis() - start;
+                conn.disconnect();
             } catch (Exception e) {
                 try {
                     long start = System.currentTimeMillis();
-                    URL url = new URL("https://www.gstatic.com/generate_204");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setConnectTimeout(2000);
-                    conn.setReadTimeout(2000);
+                    int socksPort = getSharedPreferences("vpn_settings_data", MODE_PRIVATE)
+                            .getInt("current_socks_port", 10808);
+                    Proxy proxy = new Proxy(Proxy.Type.SOCKS,
+                            new InetSocketAddress("127.0.0.1", socksPort));
+                    HttpURLConnection conn = (HttpURLConnection)
+                            new URL("https://www.example.com/").openConnection(proxy);
+                    conn.setConnectTimeout(3000);
+                    conn.setReadTimeout(3000);
                     conn.setUseCaches(false);
                     int code = conn.getResponseCode();
-                    if (code == 204 || code == 200) {
-                        rtt = System.currentTimeMillis() - start;
-                    }
+                    if (code >= 200 && code < 400) rtt = System.currentTimeMillis() - start;
                     conn.disconnect();
                 } catch (Exception ignored) {}
             }
