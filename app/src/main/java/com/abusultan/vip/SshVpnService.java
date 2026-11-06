@@ -138,17 +138,15 @@ public class SshVpnService extends VpnService {
                 } catch (Exception ignored) {}
                 String customPayload = parts[5];
                 String sshHostField = parts[6].trim();
-                String sid = parts[7].trim();
+                String handle = parts[7].trim();
                 Pq.p("SSH debug: type=" + connType + ", endpoint=" + safeEndpoint(sshHostField) + ", proxy=" + safeEndpoint(squidIp + ":" + squidPort) + ", payload=" + (!customPayload.trim().isEmpty()));
-
                 if (sshHostField.isEmpty()) throw new Exception("إعداد السيرفر لا يحتوي على عنوان تشغيل.");
                 if (SecureApi.isPanelHost(sshHostField)) {
                     Pq.p("🚨 [عزل اللوحة] تم رفض تشغيل عنوان لوحة abusultan vip كنفق SSH");
                     throw new Exception("تم رفض خادم اللوحة: اختر سيرفر SSH من القائمة.");
                 }
-
                 Pq.p("[1/4] جلب بيانات دخول السيرفر المختار بشكل مؤمّن...");
-                org.json.JSONObject cr = SecureApi.fetchCreds(this, sid);
+                org.json.JSONObject cr = SecureApi.fetchCreds(this, handle);
                 if (cr == null || !cr.has("user") || !cr.has("pass")) {
                     throw new Exception("فشل جلب بيانات السيرفر المؤمّنة (تحقّق من الاتصال).");
                 }

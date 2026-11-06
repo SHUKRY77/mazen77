@@ -32,6 +32,7 @@ function db(): PDO {
     $pdo->exec('CREATE TABLE IF NOT EXISTS servers (id TEXT PRIMARY KEY, country TEXT NOT NULL, subtitle TEXT NOT NULL, protocol TEXT NOT NULL, host TEXT NOT NULL, port INTEGER NOT NULL, sni TEXT NOT NULL DEFAULT \'\', network TEXT NOT NULL DEFAULT \'tcp\', path TEXT NOT NULL DEFAULT \'/\', secret_enc TEXT NOT NULL DEFAULT \'\', ssh_user_enc TEXT NOT NULL DEFAULT \'\', ssh_pass_enc TEXT NOT NULL DEFAULT \'\', public_config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT, event TEXT NOT NULL, ip_hash TEXT NOT NULL, created_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS request_nonces (token TEXT NOT NULL, nonce TEXT NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(token,nonce))');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS ssh_handles (handle TEXT PRIMARY KEY, did TEXT NOT NULL, server_id TEXT NOT NULL, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS payloads (id TEXT PRIMARY KEY, network TEXT NOT NULL, subtitle TEXT NOT NULL, config TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)');
     foreach ([
         'target_app TEXT NOT NULL DEFAULT "abusultan vip"',

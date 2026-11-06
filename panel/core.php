@@ -37,7 +37,10 @@ if (!$session) json_out(['status'=>'error','message'=>'Session expired'], 401);
 if ($devicePub !== '' && !hash_equals((string)$session['device_pub'], $devicePub)) json_out(['status'=>'error','message'=>'Device binding rejected'], 403);
 if ($action === 'get_max_app_data') {
     if (!consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|get_max_app_data||'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
-    $rows = db()->query("SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config FROM servers WHERE active=1 AND lower(host) NOT IN ('193.106.249.79','abusultan.shukry.online') ORDER BY country,id")->fetchAll();
+    $pdo = db();
+    $now = time();
+    $pdo->prepare('DELETE FROM ssh_handles WHERE expires_at<?')->execute([$now]);
+    $rows = $pdo->query("SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config FROM servers WHERE active=1 AND lower(host) NOT IN ('193.106.249.79','abusultan.shukry.online') ORDER BY country,id")->fetchAll();
     foreach ($rows as &$row) {
         if (str_starts_with((string)$row['protocol'], 'ssh') || $row['protocol'] === 'dnstt') {
             $type = match ($row['protocol']) {
@@ -59,7 +62,10 @@ if ($action === 'get_max_app_data') {
             if (preg_match('/^([^:]+):(\d+)$/', (string)$row['proxy'], $pm)) {
                 $proxyHost = $pm[1]; $proxyPort = $pm[2];
             }
-            $row['config'] = 'SSH_PAYLOAD|'.$type.'|'.str_replace('|', '', (string)$row['sni']).'|'.str_replace('|', '', $proxyHost).'|'.$proxyPort.'|'.str_replace('|', '', (string)$row['payload']).'|'.str_replace('|', '', $row['host'].':'.$row['port']).'|'.$row['id'];
+            // Opaque, short-lived handle: the real server ID never leaves the API response.
+            $handle = random_hex(24);
+            $pdo->prepare('INSERT INTO ssh_handles(handle,did,server_id,expires_at,created_at) VALUES(?,?,?,?,?)')->execute([$handle,$did,(string)$row['id'],$now+180,$now]);
+            $row['config'] = 'SSH_PAYLOAD|'.$type.'|'.str_replace('|', '', (string)$row['sni']).'|'.str_replace('|', '', $proxyHost).'|'.$proxyPort.'|'.str_replace('|', '', (string)$row['payload']).'|'.str_replace('|', '', $row['host'].':'.$row['port']).'|'.$handle;
         } else {
             $row['config'] = $row['public_config'];
         }
@@ -93,9 +99,9 @@ if ($action === 'get_max_app_data') {
     json_out(['status'=>'success','data'=>encrypt_response(json_encode($rows, JSON_UNESCAPED_SLASHES), session_key($session))]);
 }
 if ($action === 'creds') {
-    $sid = trim((string)($_GET['sid'] ?? ''));
-    if (!preg_match('/^[a-f0-9]{32}$/', $sid) || !consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|creds|'.$sid.'|'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
-    $q = db()->prepare('SELECT * FROM servers WHERE id=? AND active=1'); $q->execute([$sid]); $server=$q->fetch();
+    $handle = trim((string)($_GET['handle'] ?? ''));
+    if (!preg_match('/^[a-f0-9]{48}$/', $handle) || !consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|creds|'.$handle.'|'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
+    $q = db()->prepare('SELECT s.* FROM ssh_handles h JOIN servers s ON s.id=h.server_id WHERE h.handle=? AND h.did=? AND h.expires_at>=? AND s.active=1'); $q->execute([$handle,$did,time()]); $server=$q->fetch();
     if (!$server) json_out(['status'=>'error','message'=>'Server unavailable'], 404);
     $secret = master_decrypt($server['secret_enc']); $user = master_decrypt($server['ssh_user_enc']); $pass = master_decrypt($server['ssh_pass_enc']);
     $payload = json_encode(['secret'=>$secret,'user'=>$user,'pass'=>$pass], JSON_UNESCAPED_SLASHES);
