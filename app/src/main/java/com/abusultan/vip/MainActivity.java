@@ -137,19 +137,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int gracePeriodSeconds = -1;
     private TextView ac_xp;
 
-    // ⚠️ يجب أن تطابق هذه القيمة بالضبط قيمة API_WRAP_KEY الموجودة في ملف .env على السيرفر
-    private static final String API_WRAP_PASSPHRASE = "Hs6RpTq1WvNm4YbXk8DcZj0OeFl3GaUi7MtQsRz2Pw=";
-
-    private String getSecuredApiUrl() {
-        String rawBase = "aHR0cHM6Ly9hcHAuYXNzYWcyMDI2LmNvbS9jb3JlLnBocD8=";
-        try {
-            String decodedBase = new String(Base64.decode(rawBase, Base64.DEFAULT), "UTF-8");
-            return decodedBase + "action=get_max_app_data&proto=2";
-        } catch (Exception e) {
-            return "https://app.assag2026.com/core.php?action=get_max_app_data&proto=2";
-        }
-    }
-
     private Pq.LogListener logListener = new Pq.LogListener() {
         @Override
         public void onNewLog(String message) {
@@ -238,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // A previous APK could have cached a list from the retired panel. Never
         // display that list after switching the sole app source to abusultan.
-        String serverSource = "abusultan.shukry.online";
+        String serverSource = "https://abusultan.shukry.online/core.php";
         if (!serverSource.equals(prefs.getString("server_source", ""))) {
             deleteFile("secure_servers.dat");
             prefs.edit().putString("server_source", serverSource)
@@ -498,45 +485,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private String decryptApiPayload(String encryptedBase64) {
-        try {
-            if (encryptedBase64 == null || encryptedBase64.isEmpty()) return null;
-
-            byte[] combined = Base64.decode(encryptedBase64, Base64.DEFAULT);
-            if (combined.length < 16) return null;
-
-            byte[] iv = new byte[16];
-            System.arraycopy(combined, 0, iv, 0, 16);
-            byte[] cipherBytes = new byte[combined.length - 16];
-            System.arraycopy(combined, 16, cipherBytes, 0, cipherBytes.length);
-
-            java.security.MessageDigest sha = java.security.MessageDigest.getInstance("SHA-256");
-            byte[] keyBytes = sha.digest(API_WRAP_PASSPHRASE.getBytes("UTF-8"));
-
-            javax.crypto.spec.SecretKeySpec keySpec = new javax.crypto.spec.SecretKeySpec(keyBytes, "AES");
-            javax.crypto.spec.IvParameterSpec ivSpec = new javax.crypto.spec.IvParameterSpec(iv);
-            javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(javax.crypto.Cipher.DECRYPT_MODE, keySpec, ivSpec);
-            byte[] plainBytes = cipher.doFinal(cipherBytes);
-
-            return new String(plainBytes, "UTF-8");
-        } catch (Exception e) {
-            Pq.p("🚨 [صائد الأخطاء - فك التشفير]: فشل فك تشفير بيانات اللوحة. السبب: " + e.getMessage());
-            return null;
-        }
-    }
-
+    /** Config entries now come only from SecureApi's ECDH/AES-GCM response. */
     private String decryptSafe(String text) {
-        if (text == null || text.isEmpty()) return text;
-        if (text.startsWith("vless://") || text.startsWith("vmess://") || text.startsWith("trojan://")
-                || text.startsWith("SSH_PAYLOAD|") || text.startsWith("SSH_EXT|")) {
-            return text;
-        }
-        try {
-            String decrypted = decryptApiPayload(text);
-            if (decrypted != null && !decrypted.isEmpty()) return decrypted;
-        } catch (Exception e) {}
-        return text;
+        return text == null ? "" : text;
     }
 
     private void updateTimeDisplay() {
