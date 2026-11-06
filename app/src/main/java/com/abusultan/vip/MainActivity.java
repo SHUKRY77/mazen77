@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // A previous APK could have cached a list from the retired panel. Never
         // display that list after switching the sole app source to abusultan.
-        String serverSource = "https://abusultan.shukry.online/core.php";
+        String serverSource = "https://abusultan.shukry.online/core.php#panel-current-20261106";
         if (!serverSource.equals(prefs.getString("server_source", ""))) {
             deleteFile("secure_servers.dat");
             prefs.edit().putString("server_source", serverSource)
