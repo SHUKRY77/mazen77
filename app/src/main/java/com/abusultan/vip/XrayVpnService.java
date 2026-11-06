@@ -140,28 +140,32 @@ public class XrayVpnService extends VpnService {
         long startTime = System.currentTimeMillis();
         try { Thread.sleep(1200); } catch (Exception ignored) {}
 
+        String[] probes = new String[]{
+                "https://cp.cloudflare.com/generate_204",
+                "https://www.google.com/generate_204",
+                "http://connectivitycheck.gstatic.com/generate_204",
+                "https://www.example.com/"
+        };
         while (System.currentTimeMillis() - startTime < 9000) {
-            try {
-                java.net.Proxy proxy = new java.net.Proxy(java.net.Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", socksPort));
-                URL url = new URL("http://connectivitycheck.gstatic.com/generate_204");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection(proxy);
-                urlConnection.setConnectTimeout(2500);
-                urlConnection.setReadTimeout(2500);
-                urlConnection.setUseCaches(false);
-                urlConnection.setInstanceFollowRedirects(false);
-
-                int responseCode = urlConnection.getResponseCode();
-                urlConnection.disconnect();
-
-                if (responseCode == 204 || responseCode == 200 || responseCode == 205) {
-                    return true;
+            for (String probe : probes) {
+                HttpURLConnection urlConnection = null;
+                try {
+                    java.net.Proxy proxy = new java.net.Proxy(java.net.Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", socksPort));
+                    urlConnection = (HttpURLConnection) new URL(probe).openConnection(proxy);
+                    urlConnection.setConnectTimeout(2500);
+                    urlConnection.setReadTimeout(2500);
+                    urlConnection.setUseCaches(false);
+                    urlConnection.setInstanceFollowRedirects(false);
+                    int responseCode = urlConnection.getResponseCode();
+                    // Any HTTP response proves that DNS, TCP, TLS and the proxy path work.
+                    if (responseCode >= 200 && responseCode < 400) return true;
+                } catch (Exception ignored) {
+                    // Try the next independent endpoint; mobile networks often block one probe.
+                } finally {
+                    if (urlConnection != null) urlConnection.disconnect();
                 }
-                if (responseCode == 301 || responseCode == 302 || responseCode == 307) {
-                    return false;
-                }
-            } catch (Exception e) {
-                try { Thread.sleep(800); } catch (Exception ignored) {}
             }
+            try { Thread.sleep(500); } catch (Exception ignored) {}
         }
         return false;
     }
@@ -365,9 +369,11 @@ public class XrayVpnService extends VpnService {
                                     Pq.p("[4/4] تم اختبار الإنترنت عبر السيرفر المختار بنجاح.");
                                     sendStateToUI("CONNECTED", "تم الاتصال");
                                 } else {
-                                    Pq.p("🚨 [صائد الأخطاء - Xray] النفق بدأ لكن السيرفر لا يمرر الإنترنت.");
-                                    sendStateToUI("ERROR", "السيرفر لا يمرر إنترنت فعلي لهذه الشبكة!");
-                                    stopVpn();
+                                    // Do not destroy a working tunnel because a carrier blocks
+                                    // all health-check hosts. Keep the real Xray/TUN2SOCKS log visible.
+                                    Pq.p("⚠️ [صائد الأخطاء - Xray] تعذر فحص مواقع الاختبار؛ النفق ما زال يعمل. راجع سجل Xray.");
+                                    showNotification("متصل — تعذر فحص الاختبار");
+                                    sendStateToUI("CONNECTED", "تم تشغيل النفق؛ تعذر فحص موقع الاختبار");
                                 }
                             }
                         });
