@@ -770,8 +770,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String getLinkToTest() {
-        if (selectedPayloadLink != null && !selectedPayloadLink.isEmpty()) return selectedPayloadLink;
         if (selectedServerLink != null && !selectedServerLink.isEmpty()) return selectedServerLink;
+        if (selectedPayloadLink != null && !selectedPayloadLink.isEmpty()) return selectedPayloadLink;
         return "";
     }
 

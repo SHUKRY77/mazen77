@@ -129,7 +129,7 @@ public class SshVpnService extends VpnService {
                     throw new Exception("تكوين السيرفر غير صالح!");
                 }
 
-                String connType = parts[1] == null ? "" : parts[1].trim().toLowerCase();
+                String connType = parts[1] == null ? "" : parts[1].trim().toLowerCase(java.util.Locale.US);
                 String sni = parts[2].trim();
                 String squidIp = parts[3].trim();
                 int squidPort = 80;
@@ -155,20 +155,29 @@ public class SshVpnService extends VpnService {
                 String sshUser = cr.getString("user");
                 String sshPass = cr.getString("pass");
 
-                if (connType.isEmpty()) connType = CONN_TYPE_SSL_PAYLOAD;
+                if (connType.isEmpty()) throw new Exception("نوع اتصال SSH غير محدد في إعداد اللوحة.");
 
                 // SlowDNS هو الوحيد المؤجل لأنه يحتاج ملف dnstt-client
                 if (connType.equals(CONN_TYPE_SLOWDNS)) {
                     throw new Exception("نوع الاتصال SlowDNS يحتاج ملف dnstt-client في jniLibs.");
                 }
 
-                String sshHostOnly = sshHostField.contains(":") ? sshHostField.split(":")[0] : sshHostField;
-                int sshPort = (connType.contains("tls") || connType.equals("ssl_proxy") || connType.equals("ssl_payload")) ? 443 : 22;
-                if (sshHostField.contains(":")) {
+                String sshHostOnly = sshHostField;
+                int sshPort = 22;
+                int separator = sshHostField.lastIndexOf(':');
+                if (separator > 0 && separator < sshHostField.length() - 1) {
                     try {
-                        sshPort = Integer.parseInt(sshHostField.split(":")[1]);
-                    } catch (Exception ignored) {}
+                        int requestedPort = Integer.parseInt(sshHostField.substring(separator + 1));
+                        if (requestedPort < 1 || requestedPort > 65535) {
+                            throw new Exception("منفذ SSH خارج النطاق: " + requestedPort);
+                        }
+                        sshHostOnly = sshHostField.substring(0, separator);
+                        sshPort = requestedPort;
+                    } catch (NumberFormatException ignored) {
+                        // Host without an explicit port: use the standard SSH TCP port.
+                    }
                 }
+                Pq.p("SSH target: host=" + safeEndpoint(sshHostOnly) + ", port=" + sshPort + ", protocol=" + connType);
 
                 jsch = new JSch();
                 sshSession = jsch.getSession(sshUser, sshHostOnly, sshPort);
@@ -186,7 +195,7 @@ public class SshVpnService extends VpnService {
                         Pq.p("وضع الاتصال: SSH Direct");
                     }
                 } else if (connType.equals(CONN_TYPE_UDP)) {
-                    Pq.p("وضع الاتصال: SSH UDP / BadVPN");
+                    throw new Exception("UDP ليس منفذ SSH؛ يجب أن يكون SSH على TCP، وUDP Gateway يحتاج منفذ UDPGW منفردًا.");
                 } else if (connType.equals(CONN_TYPE_PAYLOAD)) {
                     Pq.p("وضع الاتصال: SSH Payload");
                     sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.DIRECT, "", 0, sni, customPayload, sshHostOnly, sshPort));
@@ -208,9 +217,17 @@ public class SshVpnService extends VpnService {
                 } else if (connType.equals(CONN_TYPE_TLS_PROXY_PAYLOAD)) {
                     Pq.p("وضع الاتصال: SSH TLS + Proxy + Payload");
                     sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.TLS_PROXY, squidIp, squidPort, sni, customPayload, sshHostOnly, sshPort));
+                } else if (connType.equals("ws") || connType.equals("ws_payload")) {
+                    if (customPayload.trim().isEmpty()) {
+                        throw new Exception("SSH WebSocket يحتاج Payload يحتوي طلب WebSocket.");
+                    }
+                    String wsHost = squidIp.isEmpty() ? sshHostOnly : squidIp;
+                    int wsPort = squidIp.isEmpty() ? sshPort : squidPort;
+                    String wsSni = sni.isEmpty() ? sshHostOnly : sni;
+                    Pq.p("وضع الاتصال: SSH WebSocket" + (squidIp.isEmpty() ? " Direct" : " + Proxy"));
+                    sshSession.setProxy(new CloudflareWsProxy(wsHost, wsPort, wsSni, customPayload, sshHostOnly));
                 } else {
-                    Pq.p("وضع الاتصال: SSH TLS + Payload");
-                    sshSession.setProxy(new CloudflareWsProxy(squidIp, squidPort, sni, customPayload, sshHostOnly));
+                    throw new Exception("نوع SSH غير مدعوم: " + connType);
                 }
 
                 Pq.p("[2/4] الاتصال بعنوان السيرفر المختار وليس عنوان اللوحة...");

@@ -49,6 +49,8 @@ if ($action === 'get_max_app_data') {
                 'ssh-tls-proxy' => 'ssl_proxy',
                 'ssh-tls-payload' => 'tls_payload',
                 'ssh-tls-proxy-payload' => 'tls_proxy_payload',
+                'ssh-ws' => 'ws',
+                'ssh-ws-payload' => 'ws_payload',
                 'dnstt' => 'slowdns',
                 default => 'payload',
             };
