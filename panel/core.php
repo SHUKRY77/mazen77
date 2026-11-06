@@ -96,7 +96,8 @@ if ($action === 'get_max_app_data') {
     $rows = $topRows;
     $payloads = array_merge($payloads, $serverPayloads);
     $rows = array_merge($rows, $payloads);
-    json_out(['status'=>'success','data'=>encrypt_response(json_encode($rows, JSON_UNESCAPED_SLASHES), session_key($session))]);
+    // إعدادات النفق غير السرية تُعاد كما هي؛ بيانات الدخول تبقى في action=creds المشفّر.
+    json_out(['status'=>'success','data'=>json_encode($rows, JSON_UNESCAPED_SLASHES)]);
 }
 if ($action === 'creds') {
     $handle = trim((string)($_GET['handle'] ?? ''));
