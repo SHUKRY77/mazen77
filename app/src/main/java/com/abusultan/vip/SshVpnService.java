@@ -214,7 +214,13 @@ public class SshVpnService extends VpnService {
                     sshSession.setProxy(new SslConnectProxy(squidIp, squidPort, sni, sshHostField));
                 } else if (connType.equals(CONN_TYPE_TLS_PROXY_PAYLOAD)) {
                     Pq.p("وضع الاتصال: SSH TLS + Proxy + Payload");
-                    sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.TLS_PROXY, squidIp, squidPort, sni, customPayload, sshHostOnly, sshPort));
+                    if (customPayload.toLowerCase(java.util.Locale.US).contains("websocket")
+                            || customPayload.toLowerCase(java.util.Locale.US).contains("upgrade:")) {
+                        Pq.p("[WebSocket] استخدام محرك Cloudflare WebSocket لإطارات SSH");
+                        sshSession.setProxy(new CloudflareWsProxy(squidIp, squidPort, sni, customPayload, sshHostOnly));
+                    } else {
+                        sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.TLS_PROXY, squidIp, squidPort, sni, customPayload, sshHostOnly, sshPort));
+                    }
                 } else if (connType.equals("ws") || connType.equals("ws_payload")) {
                     if (customPayload.trim().isEmpty()) {
                         throw new Exception("SSH WebSocket يحتاج Payload يحتوي طلب WebSocket.");
