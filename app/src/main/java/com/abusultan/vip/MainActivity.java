@@ -447,8 +447,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             FileOutputStream fos = openFileOutput("secure_servers.dat", Context.MODE_PRIVATE);
             fos.write(encryptedData.getBytes());
             fos.close();
+            clearStaleServerSelection(encryptedData);
         } catch (Exception e) {
             Pq.p("🚨 [صائد الأخطاء - حفظ السيرفرات]: فشل حفظ الملف محلياً بسبب: " + e.getMessage());
+        }
+    }
+
+    /** Never keep or run a server link that is absent from the latest panel response. */
+    private void clearStaleServerSelection(String json) {
+        if (selectedServerLink == null || selectedServerLink.isEmpty()) return;
+        boolean found = false;
+        try {
+            JSONArray array = new JSONArray(json == null || json.trim().isEmpty() ? "[]" : json);
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject item = array.optJSONObject(i);
+                if (item == null) continue;
+                String link = decryptSafe(item.optString("config", ""));
+                if (selectedServerLink.equals(link)) {
+                    found = true;
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
+        if (!found) {
+            Pq.p("[تحديث اللوحة] تم مسح اختيار سيرفر قديم غير موجود في القائمة الحالية.");
+            selectedServerName = "Auto select servers";
+            selectedServerLink = "";
+            selectedServerSubtitle = "Smart Premium Selection";
+            prefs.edit().putString("selectedServerName", selectedServerName)
+                    .putString("selectedServerLink", "")
+                    .putString("selectedServerSubtitle", selectedServerSubtitle)
+                    .apply();
         }
     }
 
