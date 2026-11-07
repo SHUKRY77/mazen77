@@ -84,6 +84,9 @@ if ($action === 'get_max_app_data') {
     $serverPayloads = [];
     $topRows = [];
     foreach ($rows as $serverRow) {
+        // Every panel server must appear in the app's Servers tab.
+        // SSH entries may additionally appear in Networks for payload selection.
+        $topRows[] = $serverRow;
         if (str_starts_with((string)$serverRow['config'], 'SSH_PAYLOAD|')) {
             $serverPayloads[] = [
                 'name' => $serverRow['carrier'] !== '' ? $serverRow['carrier'] : $serverRow['country'],
@@ -92,8 +95,6 @@ if ($action === 'get_max_app_data') {
             ];
         } else {
             $networkName = $serverRow['carrier'] !== '' ? $serverRow['carrier'] : $serverRow['country'];
-            unset($serverRow['carrier'], $serverRow['protocol']);
-            $topRows[] = $serverRow;
             $serverPayloads[] = [
                 'network' => $networkName,
                 'subtitle' => $serverRow['subtitle'],
