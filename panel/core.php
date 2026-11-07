@@ -3,6 +3,11 @@ declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
 $action = (string)($_GET['action'] ?? '');
+$requestMethod = (string)($_SERVER['REQUEST_METHOD'] ?? 'GET');
+if ($action === '' && $requestMethod === 'GET') {
+    header('Location: /admin.php', true, 302);
+    exit;
+}
 $did = trim((string)($_GET['did'] ?? ''));
 $ts = (string)($_GET['ts'] ?? '');
 $devicePub = (string)($_GET['pk'] ?? '');
