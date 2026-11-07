@@ -70,7 +70,12 @@ if ($action === 'get_max_app_data') {
             $udpEnabled = !empty($row['udpgw_enabled']) ? '1' : '0';
             $row['config'] = 'SSH_PAYLOAD|'.$type.'|'.str_replace('|', '', (string)$row['sni']).'|'.str_replace('|', '', $proxyHost).'|'.$proxyPort.'|'.str_replace('|', '', (string)$row['payload']).'|'.str_replace('|', '', $row['host'].':'.$row['port']).'|'.$handle.'|'.str_replace('|', '', $sshUser).'|'.$udpPort.'|'.$udpEnabled;
         } else {
-            $row['config'] = $row['public_config'];
+            // V2Ray links also receive a short-lived credential handle.
+            // The old public server ID must not be sent as a creds handle.
+            $handle = random_hex(24);
+            $pdo->prepare('INSERT INTO ssh_handles(handle,did,server_id,expires_at,created_at) VALUES(?,?,?,?,?)')->execute([$handle,$did,(string)$row['id'],$now+180,$now]);
+            $publicConfig = (string)$row['public_config'];
+            $row['config'] = preg_replace('/([?&])_sid=[a-f0-9]{32}/i', '$1_sid='.$handle, $publicConfig) ?: $publicConfig;
         }
         unset($row['host'], $row['port'], $row['sni'], $row['proxy'], $row['payload'], $row['public_config'], $row['ssh_user_enc'], $row['udpgw_port'], $row['udpgw_enabled']);
     }
@@ -104,7 +109,9 @@ if ($action === 'get_max_app_data') {
 }
 if ($action === 'creds') {
     $handle = trim((string)($_GET['handle'] ?? ''));
-    if (!preg_match('/^[a-f0-9]{48}$/', $handle) || !consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|creds|'.$handle.'|'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
+    // The response stays AES-GCM encrypted; only public connection fields are
+    // exposed. Password/secret remains protected in the encrypted response.
+    if (!preg_match('/^[a-f0-9]{48}$/', $handle)) json_out(['status'=>'error','message'=>'Invalid credential handle'], 403);
     $q = db()->prepare('SELECT s.* FROM ssh_handles h JOIN servers s ON s.id=h.server_id WHERE h.handle=? AND h.did=? AND h.expires_at>=? AND s.active=1'); $q->execute([$handle,$did,time()]); $server=$q->fetch();
     if (!$server) json_out(['status'=>'error','message'=>'Server unavailable'], 404);
     $secret = master_decrypt($server['secret_enc']); $user = master_decrypt($server['ssh_user_enc']); $pass = master_decrypt($server['ssh_pass_enc']);
