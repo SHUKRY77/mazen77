@@ -40,7 +40,7 @@ if ($action === 'get_max_app_data') {
     $pdo = db();
     $now = time();
     $pdo->prepare('DELETE FROM ssh_handles WHERE expires_at<?')->execute([$now]);
-    $rows = $pdo->query("SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config,ssh_user_enc FROM servers WHERE active=1 AND lower(host) NOT IN ('193.106.249.79','abusultan.shukry.online') ORDER BY country,id")->fetchAll();
+    $rows = $pdo->query("SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config,ssh_user_enc,udpgw_port,udpgw_enabled FROM servers WHERE active=1 AND lower(host) NOT IN ('193.106.249.79','abusultan.shukry.online') ORDER BY country,id")->fetchAll();
     foreach ($rows as &$row) {
         if (str_starts_with((string)$row['protocol'], 'ssh') || $row['protocol'] === 'dnstt') {
             $type = match ($row['protocol']) {
@@ -66,11 +66,13 @@ if ($action === 'get_max_app_data') {
             $handle = random_hex(24);
             $pdo->prepare('INSERT INTO ssh_handles(handle,did,server_id,expires_at,created_at) VALUES(?,?,?,?,?)')->execute([$handle,$did,(string)$row['id'],$now+180,$now]);
             $sshUser = master_decrypt((string)$row['ssh_user_enc']);
-            $row['config'] = 'SSH_PAYLOAD|'.$type.'|'.str_replace('|', '', (string)$row['sni']).'|'.str_replace('|', '', $proxyHost).'|'.$proxyPort.'|'.str_replace('|', '', (string)$row['payload']).'|'.str_replace('|', '', $row['host'].':'.$row['port']).'|'.$handle.'|'.str_replace('|', '', $sshUser);
+            $udpPort = max(1, min(65535, (int)($row['udpgw_port'] ?? 7300)));
+            $udpEnabled = !empty($row['udpgw_enabled']) ? '1' : '0';
+            $row['config'] = 'SSH_PAYLOAD|'.$type.'|'.str_replace('|', '', (string)$row['sni']).'|'.str_replace('|', '', $proxyHost).'|'.$proxyPort.'|'.str_replace('|', '', (string)$row['payload']).'|'.str_replace('|', '', $row['host'].':'.$row['port']).'|'.$handle.'|'.str_replace('|', '', $sshUser).'|'.$udpPort.'|'.$udpEnabled;
         } else {
             $row['config'] = $row['public_config'];
         }
-        unset($row['host'], $row['port'], $row['sni'], $row['proxy'], $row['payload'], $row['public_config'], $row['ssh_user_enc']);
+        unset($row['host'], $row['port'], $row['sni'], $row['proxy'], $row['payload'], $row['public_config'], $row['ssh_user_enc'], $row['udpgw_port'], $row['udpgw_enabled']);
     }
     unset($row);
     $payloads = db()->query('SELECT network,subtitle,config FROM payloads WHERE active=1 ORDER BY network,id')->fetchAll();

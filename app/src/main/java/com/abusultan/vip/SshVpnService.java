@@ -43,7 +43,6 @@ public class SshVpnService extends VpnService {
     private static final String CONN_TYPE_UDP         = "udp";
     private static final String CONN_TYPE_SLOWDNS     = "slowdns";
 
-    private static final int REMOTE_UDPGW_PORT = 7300;
     private static final int LOCAL_UDPGW_FORWARD_PORT = 7300;
 
     private ParcelFileDescriptor vpnInterface;
@@ -115,6 +114,13 @@ public class SshVpnService extends VpnService {
         sendBroadcast(intent);
     }
 
+    private static int parsePort(String value, int fallback) {
+        try {
+            int port = Integer.parseInt(value.trim());
+            return port >= 1 && port <= 65535 ? port : fallback;
+        } catch (Exception ignored) { return fallback; }
+    }
+
     private void startSshTunnel(String payloadData) {
         isProcessRunning = true;
         new Thread(() -> {
@@ -140,6 +146,8 @@ public class SshVpnService extends VpnService {
                 String sshHostField = parts[6].trim();
                 String handle = parts[7].trim();
                 String publicSshUser = parts.length > 8 ? parts[8].trim() : "";
+                int udpgwPort = parts.length > 9 ? parsePort(parts[9], 7300) : 7300;
+                boolean udpgwEnabled = parts.length <= 10 || "1".equals(parts[10].trim());
                 Pq.p("SSH debug: type=" + connType + ", endpoint=" + safeEndpoint(sshHostField) + ", proxy=" + safeEndpoint(squidIp + ":" + squidPort) + ", payload=" + (!customPayload.trim().isEmpty()));
                 if (sshHostField.isEmpty()) throw new Exception("إعداد السيرفر لا يحتوي على عنوان تشغيل.");
                 if (SecureApi.isPanelHost(sshHostField)) {
@@ -246,7 +254,8 @@ public class SshVpnService extends VpnService {
                 // فتح وإعادة توجيه منفذ UDP 7300 للألعاب والمكالمات
                 boolean udpForwardOk = false;
                 try {
-                    sshSession.setPortForwardingL("127.0.0.1", LOCAL_UDPGW_FORWARD_PORT, "127.0.0.1", REMOTE_UDPGW_PORT);
+                    if (!udpgwEnabled) throw new Exception("UDPGW disabled by panel");
+                    sshSession.setPortForwardingL("127.0.0.1", LOCAL_UDPGW_FORWARD_PORT, "127.0.0.1", udpgwPort);
                     udpForwardOk = true;
                     Pq.p("✅ تم فتح قناة UDP Gateway بنجاح (منفذ 7300)");
                 } catch (Exception e) {

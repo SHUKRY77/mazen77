@@ -48,7 +48,12 @@ function db(): PDO {
         'reality_short_id TEXT NOT NULL DEFAULT ""',
         'reality_dest TEXT NOT NULL DEFAULT ""',
         'dns_nameserver TEXT NOT NULL DEFAULT ""',
-        'dns_public_key TEXT NOT NULL DEFAULT ""'
+        'dns_public_key TEXT NOT NULL DEFAULT ""',
+        'udpgw_port INTEGER NOT NULL DEFAULT 7300',
+        'udpgw_enabled INTEGER NOT NULL DEFAULT 1',
+        'proxy_auth INTEGER NOT NULL DEFAULT 0',
+        'dns_resolver TEXT NOT NULL DEFAULT "8.8.8.8:53"',
+        'dnstt_mode TEXT NOT NULL DEFAULT "UDP"'
     ] as $column) {
         try { $pdo->exec('ALTER TABLE servers ADD COLUMN '.$column); } catch (Throwable $ignored) {}
     }
