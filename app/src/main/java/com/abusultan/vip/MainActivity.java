@@ -1433,12 +1433,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject obj = jsonArray.getJSONObject(i);
 
-                            if (!obj.has("country")) continue;
-
-                            String name = obj.optString("country", "Server " + (i + 1));
+                            String name;
+                            String displaySubtitle;
+                            if (obj.has("country")) {
+                                name = obj.optString("country", "Server " + (i + 1));
+                                displaySubtitle = obj.optString("subtitle", "Fast Server ⚡");
+                            } else if (obj.has("name")) {
+                                // Backward-compatible with API responses that
+                                // previously exposed SSH rows as name/info.
+                                name = obj.optString("name", "Server " + (i + 1));
+                                displaySubtitle = obj.optString("info", "SSH Connection");
+                            } else {
+                                continue;
+                            }
                             String link = obj.optString("config", "");
                             link = decryptSafe(link);
-                            String displaySubtitle = obj.optString("subtitle", "Fast Server ⚡");
 
                             boolean exists = false;
                             for (ServerData sd : serverDataList) {
