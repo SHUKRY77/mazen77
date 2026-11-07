@@ -139,6 +139,7 @@ public class SshVpnService extends VpnService {
                 String customPayload = parts[5];
                 String sshHostField = parts[6].trim();
                 String handle = parts[7].trim();
+                String publicSshUser = parts.length > 8 ? parts[8].trim() : "";
                 Pq.p("SSH debug: type=" + connType + ", endpoint=" + safeEndpoint(sshHostField) + ", proxy=" + safeEndpoint(squidIp + ":" + squidPort) + ", payload=" + (!customPayload.trim().isEmpty()));
                 if (sshHostField.isEmpty()) throw new Exception("إعداد السيرفر لا يحتوي على عنوان تشغيل.");
                 if (SecureApi.isPanelHost(sshHostField)) {
@@ -147,11 +148,12 @@ public class SshVpnService extends VpnService {
                 }
                 Pq.p("[1/4] جلب بيانات دخول السيرفر المختار بشكل مؤمّن...");
                 org.json.JSONObject cr = SecureApi.fetchCreds(this, handle);
-                if (cr == null || !cr.has("user") || !cr.has("pass")) {
+                if (cr == null || !cr.has("pass")) {
                     throw new Exception("فشل جلب بيانات السيرفر المؤمّنة (تحقّق من الاتصال).");
                 }
-                String sshUser = cr.getString("user");
+                String sshUser = cr.optString("user", publicSshUser);
                 String sshPass = cr.getString("pass");
+                if (sshUser.isEmpty()) throw new Exception("اسم مستخدم SSH غير موجود في إعداد اللوحة.");
 
                 if (connType.isEmpty()) throw new Exception("نوع اتصال SSH غير محدد في إعداد اللوحة.");
 
