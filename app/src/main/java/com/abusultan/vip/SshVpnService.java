@@ -164,8 +164,12 @@ public class SshVpnService extends VpnService {
                 int sshPort = 22;
                 int separator = sshHostField.lastIndexOf(':');
                 if (separator > 0 && separator < sshHostField.length() - 1) {
+                    String portText = sshHostField.substring(separator + 1).trim();
+                    if (portText.contains("-")) {
+                        throw new Exception("القيمة " + portText + " نطاق UDP وليست منفذ SSH. أدخل منفذ TCP واحدًا مثل 22 أو 443.");
+                    }
                     try {
-                        int requestedPort = Integer.parseInt(sshHostField.substring(separator + 1));
+                        int requestedPort = Integer.parseInt(portText);
                         if (requestedPort < 1 || requestedPort > 65535) {
                             throw new Exception("منفذ SSH خارج النطاق: " + requestedPort);
                         }
@@ -186,12 +190,8 @@ public class SshVpnService extends VpnService {
 
                 // تم تفعيل Direct SSH و SSH UDP للعمل مباشرة وبأقل زمن تأخير
                 if (connType.equals(CONN_TYPE_DIRECT)) {
-                    if (!customPayload.trim().isEmpty()) {
-                        Pq.p("وضع الاتصال: SSH Direct + Payload");
-                        sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.DIRECT, "", 0, sni, customPayload, sshHostOnly, sshPort));
-                    } else {
-                        Pq.p("وضع الاتصال: SSH Direct");
-                    }
+                    // يطابق Injector: Direct لا يرسل Payload حتى لو بقي نص قديم في السجل.
+                    Pq.p("وضع الاتصال: SSH Direct (TCP) بدون Payload");
                 } else if (connType.equals(CONN_TYPE_UDP)) {
                     throw new Exception("UDP ليس منفذ SSH؛ يجب أن يكون SSH على TCP، وUDP Gateway يحتاج منفذ UDPGW منفردًا.");
                 } else if (connType.equals(CONN_TYPE_PAYLOAD)) {
