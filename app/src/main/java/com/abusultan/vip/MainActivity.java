@@ -1233,6 +1233,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 try {
                     String decryptedMem = SecureApi.fetchServers(MainActivity.this);
                     if (decryptedMem != null && !decryptedMem.isEmpty()) {
+                        new JSONArray(decryptedMem);
                         String oldJson = readServersFromFile();
                         if (!decryptedMem.equals(oldJson)) {
                             saveServersToFile(decryptedMem);
@@ -1241,10 +1242,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         parseAndSaveConfigVersion(decryptedMem);
                         isSuccess = true;
                     } else {
+                        clearPanelCacheAfterFetchFailure();
                         errorReason = "فشل الاتصال المؤمّن باللوحة (مصافحة/شبكة).";
                         Pq.p("🚨 [صائد الأخطاء - جلب السيرفرات]: فشلت المصافحة أو الجلب المؤمّن.");
                     }
                 } catch (Exception e) {
+                    clearPanelCacheAfterFetchFailure();
                     errorReason = "خطأ استثناء أثناء الجلب: " + e.getMessage();
                     Pq.p("🚨 [صائد الأخطاء - جلب السيرفرات]: حدث استثناء (Exception): " + e.getMessage());
                 }
@@ -1282,14 +1285,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 try {
                     String decryptedBg = SecureApi.fetchServers(MainActivity.this);
                     if (decryptedBg != null && !decryptedBg.isEmpty()) {
+                        new JSONArray(decryptedBg);
                         String oldJson = readServersFromFile();
                         if (!decryptedBg.equals(oldJson)) {
                             saveServersToFile(decryptedBg);
                             isNewUpdate = true;
                         }
                         fetchedJsonMem = decryptedBg;
+                    } else {
+                        clearPanelCacheAfterFetchFailure();
                     }
                 } catch (Exception e) {
+                    clearPanelCacheAfterFetchFailure();
                     Pq.p("🚨 [صائد الأخطاء - التحديث الخلفي]: فشل جلب التحديثات في الخلفية بسبب: " + e.getMessage());
                 }
 
@@ -1306,6 +1313,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }).start();
         }
+    }
+
+    private void clearPanelCacheAfterFetchFailure() {
+        deleteFile("secure_servers.dat");
+        selectedServerName = "Auto select servers";
+        selectedServerLink = "";
+        selectedPayloadName = "Select Network Payload";
+        selectedPayloadLink = "";
+        prefs.edit().putString("selectedServerName", selectedServerName)
+                .putString("selectedServerLink", "")
+                .putString("selectedPayloadName", selectedPayloadName)
+                .putString("selectedPayloadLink", "").apply();
+        Pq.p("[تحديث اللوحة] تم مسح القائمة القديمة بعد فشل جلب لوحة abusultan.");
     }
 
     public static class ServerData {
