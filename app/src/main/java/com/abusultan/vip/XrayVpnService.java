@@ -187,6 +187,21 @@ public class XrayVpnService extends VpnService {
         return link.replaceAll("([?&])_sid=[^&#]*(&)?", "$1").replaceAll("[?&]$", "");
     }
 
+    /** VMess stores the credential inside its Base64 JSON instead of userinfo. */
+    private static String replaceVmessAuth(String link, String secret) {
+        try {
+            if (link == null || !link.regionMatches(true, 0, "vmess://", 0, 8)) return link;
+            String encoded = link.substring(8).trim();
+            JSONObject config = new JSONObject(new String(Base64.decode(encoded, Base64.DEFAULT), "UTF-8"));
+            if ("AUTH".equalsIgnoreCase(config.optString("id"))) config.put("id", secret);
+            if ("AUTH".equalsIgnoreCase(config.optString("password"))) config.put("password", secret);
+            return "vmess://" + Base64.encodeToString(config.toString().getBytes("UTF-8"), Base64.NO_WRAP);
+        } catch (Exception e) {
+            Log.e("XrayVpnService", "VMess credential replacement failed: " + e.getMessage());
+            return link;
+        }
+    }
+
     // ===== تجهيز الرابط: استخراج عنوان السيرفر وتحويله إلى IP لاستثنائه من النفق =====
     private Resolved prepareLink(String link) {
         Resolved r = new Resolved();
@@ -266,7 +281,11 @@ public class XrayVpnService extends VpnService {
                     org.json.JSONObject cr = SecureApi.fetchCreds(this, sid);
                     if (cr != null && cr.has("secret") && !cr.optString("secret").isEmpty()) {
                         String secret = cr.getString("secret");
-                        link = link.replaceFirst("://AUTH@", "://" + java.util.regex.Matcher.quoteReplacement(secret) + "@");
+                        if (link.regionMatches(true, 0, "vmess://", 0, 8)) {
+                            link = replaceVmessAuth(link, secret);
+                        } else {
+                            link = link.replaceFirst("://AUTH@", "://" + java.util.regex.Matcher.quoteReplacement(secret) + "@");
+                        }
                     } else {
                         sendStateToUI("ERROR", "فشل جلب مفتاح السيرفر المؤمّن (تحقّق من الاتصال)!");
                         stopVpn(); return;
