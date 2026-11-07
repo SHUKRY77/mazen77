@@ -1449,11 +1449,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             String link = obj.optString("config", "");
                             link = decryptSafe(link);
 
-                            boolean exists = false;
-                            for (ServerData sd : serverDataList) {
-                                if (sd.name.equals(name) && sd.link.equals(link)) { exists = true; break; }
-                            }
-                            if (!exists) serverDataList.add(new ServerData(name, link, displaySubtitle));
+                            // Do not deduplicate server rows. The same host/port
+                            // may intentionally be configured with another proxy,
+                            // payload, SNI or protocol.
+                            serverDataList.add(new ServerData(name, link, displaySubtitle));
                         }
                     } catch (Exception e) {}
                 }
