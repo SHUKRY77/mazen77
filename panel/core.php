@@ -154,7 +154,15 @@ if ($action === 'get_max_app_data') {
             $publicConfig = (string)$row['public_config'];
             // Replace any legacy/internal sid, not only the old 32-hex format.
             // The app's creds endpoint accepts only this fresh 48-hex handle.
-            $row['config'] = preg_replace('/([?&])_sid=[^&#]+/i', '$1_sid='.$handle, $publicConfig) ?: $publicConfig;
+            $updatedConfig = preg_replace('/([?&])_sid=[^&#]+/i', '$1_sid='.$handle, $publicConfig);
+            if ($updatedConfig === null || $updatedConfig === $publicConfig) {
+                $fragment = '';
+                $base = $publicConfig;
+                $hash = strpos($base, '#');
+                if ($hash !== false) { $fragment = substr($base, $hash); $base = substr($base, 0, $hash); }
+                $updatedConfig = $base . (str_contains($base, '?') ? '&' : '?') . '_sid=' . $handle . $fragment;
+            }
+            $row['config'] = $updatedConfig;
         }
         unset($row['host'], $row['port'], $row['sni'], $row['proxy'], $row['payload'], $row['public_config'], $row['ssh_user_enc'], $row['udpgw_port'], $row['udpgw_enabled']);
     }
