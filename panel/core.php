@@ -38,7 +38,18 @@ function sync_legacy_mysql_servers(PDO $sqlite): void {
         };
         $upsert = $sqlite->prepare("INSERT INTO servers(id,country,subtitle,protocol,host,port,sni,network,path,secret_enc,ssh_user_enc,ssh_pass_enc,public_config,active,created_at,updated_at,carrier,tls,proxy,payload) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET country=excluded.country,subtitle=excluded.subtitle,protocol=excluded.protocol,host=excluded.host,port=excluded.port,sni=excluded.sni,network=excluded.network,path=excluded.path,secret_enc=excluded.secret_enc,ssh_user_enc=excluded.ssh_user_enc,ssh_pass_enc=excluded.ssh_pass_enc,public_config=excluded.public_config,active=1,updated_at=excluded.updated_at,carrier=excluded.carrier,tls=excluded.tls,proxy=excluded.proxy,payload=excluded.payload");
         $now = time();
-        foreach ($mysql->query('SELECT id,country,network,config_url,subtitle FROM servers_max ORDER BY id') as $r) {
+        $v2Rows = $mysql->query('SELECT id,country,network,config_url,subtitle FROM servers_max ORDER BY id')->fetchAll();
+        $sshRows = $mysql->query('SELECT id,network_name,conn_type,ssh_host,subtitle,sni,ssl_port,payload,squid_port,squid_ip,ssh_user,ssh_pass FROM ssh_servers_max ORDER BY id')->fetchAll();
+        $legacyIds = [];
+        foreach ($v2Rows as $r) $legacyIds[] = 'legacy-v2ray-'.(int)$r['id'];
+        foreach ($sshRows as $r) $legacyIds[] = 'legacy-ssh-'.(int)$r['id'];
+        if ($legacyIds) {
+            $marks = implode(',', array_fill(0, count($legacyIds), '?'));
+            $sqlite->prepare("DELETE FROM servers WHERE id LIKE 'legacy-%' AND id NOT IN ($marks)")->execute($legacyIds);
+        } else {
+            $sqlite->exec("DELETE FROM servers WHERE id LIKE 'legacy-%'");
+        }
+        foreach ($v2Rows as $r) {
             $secret = '';
             $link = $publicV2ray($decrypt((string)$r['config_url']), $secret);
             $parts = parse_url($link);
@@ -53,7 +64,7 @@ function sync_legacy_mysql_servers(PDO $sqlite): void {
             $public = str_replace('AUTH@', rawurlencode('AUTH').'@', $link);
             $upsert->execute([$id,(string)$r['country'],(string)$r['subtitle'],$protocol,$hostName,$port,$sni,'tcp','/',master_encrypt($secret),master_encrypt(''),master_encrypt(''),$public,1,$now,$now,(string)$r['network'],!empty($q['security']) && strtolower((string)$q['security'])==='tls','',(string)($q['path'] ?? '')]);
         }
-        foreach ($mysql->query('SELECT id,network_name,conn_type,ssh_host,subtitle,sni,ssl_port,payload,squid_port,squid_ip,ssh_user,ssh_pass FROM ssh_servers_max ORDER BY id') as $r) {
+        foreach ($sshRows as $r) {
             $type = strtoupper((string)$r['conn_type']);
             $protocol = match ($type) {
                 'DIRECT' => 'ssh', 'HTTP_PROXY' => 'ssh-proxy', 'HTTP_PAYLOAD' => 'ssh-proxy-payload',
