@@ -152,7 +152,9 @@ if ($action === 'get_max_app_data') {
             $handle = random_hex(24);
             $pdo->prepare('INSERT INTO ssh_handles(handle,did,server_id,expires_at,created_at) VALUES(?,?,?,?,?)')->execute([$handle,$did,(string)$row['id'],$now+180,$now]);
             $publicConfig = (string)$row['public_config'];
-            $row['config'] = preg_replace('/([?&])_sid=[a-f0-9]{32}/i', '$1_sid='.$handle, $publicConfig) ?: $publicConfig;
+            // Replace any legacy/internal sid, not only the old 32-hex format.
+            // The app's creds endpoint accepts only this fresh 48-hex handle.
+            $row['config'] = preg_replace('/([?&])_sid=[^&#]+/i', '$1_sid='.$handle, $publicConfig) ?: $publicConfig;
         }
         unset($row['host'], $row['port'], $row['sni'], $row['proxy'], $row['payload'], $row['public_config'], $row['ssh_user_enc'], $row['udpgw_port'], $row['udpgw_enabled']);
     }
