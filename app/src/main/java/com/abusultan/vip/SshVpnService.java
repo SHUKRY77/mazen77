@@ -195,6 +195,10 @@ public class SshVpnService extends VpnService {
                 sshSession = jsch.getSession(sshUser, sshHostOnly, sshPort);
                 sshSession.setPassword(sshPass);
                 sshSession.setConfig("StrictHostKeyChecking", "no");
+                // Injector's Password authentication does not waste attempts
+                // on unavailable key/GSSAPI methods. This also supports the
+                // restricted shell accounts commonly used for SSH tunnels.
+                sshSession.setConfig("PreferredAuthentications", "password,keyboard-interactive");
                 sshSession.setServerAliveInterval(15000);
                 sshSession.setServerAliveCountMax(2);
 
