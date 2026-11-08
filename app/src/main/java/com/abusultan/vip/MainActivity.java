@@ -1443,8 +1443,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 // previously exposed SSH rows as name/info.
                                 name = obj.optString("name", "Server " + (i + 1));
                                 displaySubtitle = obj.optString("info", "SSH Connection");
+                            } else if (obj.has("network")) {
+                                // Some panel versions expose a server profile
+                                // as a network row. It is still a real server
+                                // and must remain selectable in Servers.
+                                name = obj.optString("network", "Server " + (i + 1));
+                                displaySubtitle = obj.optString("subtitle", "Network Server");
                             } else {
-                                continue;
+                                String rawConfig = obj.optString("config", "");
+                                if (rawConfig.trim().isEmpty()) continue;
+                                name = "Server " + (i + 1);
+                                displaySubtitle = "Panel server";
                             }
                             String link = obj.optString("config", "");
                             link = decryptSafe(link);
