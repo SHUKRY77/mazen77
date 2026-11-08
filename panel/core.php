@@ -2,6 +2,77 @@
 declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
+/** Import the legacy panel's MySQL profiles into the secure API store. */
+function sync_legacy_mysql_servers(PDO $sqlite): void {
+    static $done = false;
+    if ($done) return;
+    $done = true;
+    try {
+        $host = getenv('PANEL_DB_HOST') ?: '127.0.0.1';
+        $name = getenv('PANEL_DB_NAME') ?: 'vpn_db';
+        $user = getenv('PANEL_DB_USER') ?: 'root';
+        $pass = getenv('PANEL_DB_PASS') ?: '';
+        $key  = getenv('PANEL_DB_ENCRYPT_KEY') ?: '';
+        if ($pass === '' || $key === '') return;
+        $mysql = new PDO("mysql:host={$host};dbname={$name};charset=utf8mb4", $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+        $mysql->exec('SET NAMES utf8mb4');
+        $decrypt = static function (string $value) use ($key): string {
+            if ($value === '') return '';
+            $raw = base64_decode($value, true);
+            if ($raw !== false && strlen($raw) > 16) {
+                $plain = openssl_decrypt(substr($raw, 16), 'aes-256-cbc', $key, OPENSSL_RAW_DATA, substr($raw, 0, 16));
+                if ($plain !== false) return (string)$plain;
+            }
+            return $value;
+        };
+        $publicV2ray = static function (string $link, string &$secret): string {
+            $link = trim($link);
+            if (preg_match('~^([a-z][a-z0-9+.-]*)://([^@/?#]+)@~i', $link, $m)) {
+                $secret = rawurldecode($m[2]);
+                return substr_replace($link, 'AUTH@', strlen($m[1]) + 3, strlen($m[2]) + 1);
+            }
+            return $link;
+        };
+        $upsert = $sqlite->prepare("INSERT INTO servers(id,country,subtitle,protocol,host,port,sni,network,path,secret_enc,ssh_user_enc,ssh_pass_enc,public_config,active,created_at,updated_at,carrier,tls,proxy,payload) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET country=excluded.country,subtitle=excluded.subtitle,protocol=excluded.protocol,host=excluded.host,port=excluded.port,sni=excluded.sni,network=excluded.network,path=excluded.path,secret_enc=excluded.secret_enc,ssh_user_enc=excluded.ssh_user_enc,ssh_pass_enc=excluded.ssh_pass_enc,public_config=excluded.public_config,active=1,updated_at=excluded.updated_at,carrier=excluded.carrier,tls=excluded.tls,proxy=excluded.proxy,payload=excluded.payload");
+        $now = time();
+        foreach ($mysql->query('SELECT id,country,network,config_url,subtitle FROM servers_max ORDER BY id') as $r) {
+            $secret = '';
+            $link = $publicV2ray($decrypt((string)$r['config_url']), $secret);
+            $parts = parse_url($link);
+            $scheme = strtolower((string)($parts['scheme'] ?? 'vless'));
+            $protocol = in_array($scheme, ['vless','vmess','trojan'], true) ? $scheme : 'vless';
+            $hostName = (string)($parts['host'] ?? '');
+            $port = (int)($parts['port'] ?? 443);
+            $sni = '';
+            if (!empty($parts['query'])) parse_str((string)$parts['query'], $q); else $q = [];
+            $sni = (string)($q['sni'] ?? $q['host'] ?? $hostName);
+            $id = 'legacy-v2ray-'.(int)$r['id'];
+            $public = str_replace('AUTH@', rawurlencode('AUTH').'@', $link);
+            $upsert->execute([$id,(string)$r['country'],(string)$r['subtitle'],$protocol,$hostName,$port,$sni,'tcp','/',master_encrypt($secret),master_encrypt(''),master_encrypt(''),$public,1,$now,$now,(string)$r['network'],!empty($q['security']) && strtolower((string)$q['security'])==='tls','',(string)($q['path'] ?? '')]);
+        }
+        foreach ($mysql->query('SELECT id,network_name,conn_type,ssh_host,subtitle,sni,ssl_port,payload,squid_port,squid_ip,ssh_user,ssh_pass FROM ssh_servers_max ORDER BY id') as $r) {
+            $type = strtoupper((string)$r['conn_type']);
+            $protocol = match ($type) {
+                'DIRECT' => 'ssh', 'HTTP_PROXY' => 'ssh-proxy', 'HTTP_PAYLOAD' => 'ssh-proxy-payload',
+                'TLS_DIRECT' => 'ssh-tls', 'SSL_PROXY' => 'ssh-tls-proxy', 'TLS_PAYLOAD' => 'ssh-tls-payload',
+                'TLS_PROXY_PAYLOAD' => 'ssh-tls-proxy-payload', 'WS' => 'ssh-ws', 'WS_PAYLOAD' => 'ssh-ws-payload',
+                default => 'ssh-payload',
+            };
+            $id = 'legacy-ssh-'.(int)$r['id'];
+            $port = (int)$r['ssl_port']; if ($port < 1 || $port > 65535) $port = 22;
+            $proxy = trim((string)$r['squid_ip']); $proxyPort = (int)$r['squid_port'];
+            if ($proxy !== '' && $proxyPort > 0) $proxy .= ':'.$proxyPort;
+            $public = 'ssh://AUTH@'.rawurlencode((string)$r['ssh_host']).':'.$port.'/?_sid='.$id;
+            $upsert->execute([$id,(string)$r['network_name'],(string)$r['subtitle'],$protocol,(string)$r['ssh_host'],$port,(string)$r['sni'],'tcp','/',master_encrypt(''),master_encrypt((string)$r['ssh_user']),master_encrypt($decrypt((string)$r['ssh_pass'])),$public,1,$now,$now,(string)$r['network_name'],str_contains($type,'TLS'),$proxy,$decrypt((string)$r['payload'])]);
+        }
+    } catch (Throwable $ignored) {
+        // The secure SQLite/API source remains available if the legacy DB is offline.
+    }
+}
+
 $action = (string)($_GET['action'] ?? '');
 $requestMethod = (string)($_SERVER['REQUEST_METHOD'] ?? 'GET');
 if ($action === '' && $requestMethod === 'GET') {
@@ -43,6 +114,7 @@ if ($devicePub !== '' && !hash_equals((string)$session['device_pub'], $devicePub
 if ($action === 'get_max_app_data') {
     if (!consume_request_nonce($token, $deviceNonce) || !verify_device_proof((string)$session['device_pub'], $deviceProof, $did.'|'.$token.'|'.$ts.'|get_max_app_data||'.$deviceNonce)) json_out(['status'=>'error','message'=>'Signature rejected'], 403);
     $pdo = db();
+    sync_legacy_mysql_servers($pdo);
     $now = time();
     $pdo->prepare('DELETE FROM ssh_handles WHERE expires_at<?')->execute([$now]);
     $rows = $pdo->query("SELECT id,country,subtitle,carrier,protocol,host,port,sni,proxy,payload,public_config,ssh_user_enc,udpgw_port,udpgw_enabled FROM servers WHERE active=1 AND lower(host) NOT IN ('193.106.249.79','abusultan.shukry.online') ORDER BY country,id")->fetchAll();
