@@ -47,9 +47,25 @@ public class CloudflareWsProxy implements Proxy {
             socket.setSoTimeout(timeout);
             Pq.p("Proxy connected.");
 
+            // A TLS+HTTP-proxy profile must tunnel through CONNECT first.
+            // Opening TLS directly against the proxy endpoint makes the proxy
+            // reject the handshake before SSH/WebSocket can start.
+            InputStream rawIn = socket.getInputStream();
+            OutputStream rawOut = socket.getOutputStream();
+            String connectHost = sni == null || sni.isEmpty() ? sshHost : sni;
+            String connectRequest = "CONNECT " + connectHost + ":443 HTTP/1.1\r\n"
+                    + "Host: " + connectHost + ":443\r\n"
+                    + "Proxy-Connection: Keep-Alive\r\n\r\n";
+            rawOut.write(connectRequest.getBytes("UTF-8"));
+            rawOut.flush();
+            String connectResponse = readHeaders(rawIn);
+            if (!connectResponse.matches("(?s)^HTTP/\\d(?:\\.\\d)?\\s+2\\d\\d.*")) {
+                throw new Exception("HTTP CONNECT failed: " + connectResponse.trim());
+            }
+
             Pq.p("Establishing secure connection...");
             SSLSocketFactory sslFactory = SshTlsSocketFactory.create();
-            SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket(socket, sni, proxyPort, true);
+            SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket(socket, connectHost, 443, true);
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 SSLParameters sslParameters = sslSocket.getSSLParameters();
@@ -131,6 +147,16 @@ public class CloudflareWsProxy implements Proxy {
             Pq.p("Proxy Error: Connection failed.");
             throw e;
         }
+    }
+
+    private static String readHeaders(InputStream input) throws IOException {
+        StringBuilder response = new StringBuilder();
+        int c;
+        while ((c = input.read()) >= 0) {
+            response.append((char) c);
+            if (response.toString().endsWith("\r\n\r\n") || response.length() > 16384) break;
+        }
+        return response.toString();
     }
 
     private static final class WsOutputStream extends OutputStream {
