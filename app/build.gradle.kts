@@ -53,5 +53,8 @@ dependencies {
     implementation("androidx.preference:preference:1.2.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.android.gms:play-services-ads:23.3.0")
-    implementation("com.jcraft:jsch:0.1.55")
+    // Modern OpenSSH servers use curve25519/ed25519 algorithms that the
+    // abandoned 0.1.55 artifact cannot negotiate reliably on Android.
+    // mwiede/JSCH keeps the com.jcraft.jsch API used by the tunnel engine.
+    implementation("com.github.mwiede:jsch:0.2.20")
 }
