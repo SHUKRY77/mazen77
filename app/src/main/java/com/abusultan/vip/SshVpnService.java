@@ -231,7 +231,7 @@ public class SshVpnService extends VpnService {
                     if (customPayload.toLowerCase(java.util.Locale.US).contains("websocket")
                             || customPayload.toLowerCase(java.util.Locale.US).contains("upgrade:")) {
                         Pq.p("[WebSocket] استخدام محرك Cloudflare WebSocket لإطارات SSH");
-                        sshSession.setProxy(new CloudflareWsProxy(squidIp, squidPort, sni, customPayload, sshHostOnly));
+                        sshSession.setProxy(new CloudflareWsProxy(squidIp, squidPort, sni, customPayload, sshHostOnly, sshPort));
                     } else {
                         sshSession.setProxy(new PayloadSocketProxy(PayloadSocketProxy.Mode.TLS_PROXY, squidIp, squidPort, sni, customPayload, sshHostOnly, sshPort));
                     }
@@ -243,7 +243,7 @@ public class SshVpnService extends VpnService {
                     int wsPort = squidIp.isEmpty() ? sshPort : squidPort;
                     String wsSni = sni.isEmpty() ? sshHostOnly : sni;
                     Pq.p("وضع الاتصال: SSH WebSocket" + (squidIp.isEmpty() ? " Direct" : " + Proxy"));
-                    sshSession.setProxy(new CloudflareWsProxy(wsHost, wsPort, wsSni, customPayload, sshHostOnly));
+                    sshSession.setProxy(new CloudflareWsProxy(wsHost, wsPort, wsSni, customPayload, sshHostOnly, sshPort));
                 } else {
                     throw new Exception("نوع SSH غير مدعوم: " + connType);
                 }

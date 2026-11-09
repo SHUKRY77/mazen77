@@ -25,17 +25,23 @@ public class CloudflareWsProxy implements Proxy {
     private String sni;
     private String rawPayload;
     private String sshHost;
+    private int sshPort;
 
     private InputStream in;
     private OutputStream out;
     private Socket socket;
 
     public CloudflareWsProxy(String proxyIp, int proxyPort, String sni, String payload, String sshHost) {
+        this(proxyIp, proxyPort, sni, payload, sshHost, 443);
+    }
+
+    public CloudflareWsProxy(String proxyIp, int proxyPort, String sni, String payload, String sshHost, int sshPort) {
         this.proxyIp = proxyIp;
         this.proxyPort = proxyPort;
         this.sni = sni;
         this.rawPayload = payload;
         this.sshHost = sshHost;
+        this.sshPort = sshPort;
     }
 
     @Override
@@ -67,24 +73,11 @@ public class CloudflareWsProxy implements Proxy {
                     .replace("[cr]", "\r")
                     .replace("[lf]", "\n")
                     .replace("[host]", sshHost)
+                    .replace("[host_delivery]", sni)
+                    .replace("[host_port]", sshHost + ":" + sshPort)
                     .replace("[sni]", sni)
+                    .replace("[random=16]", randomToken(16))
                     .replace("[ua]", "Dalvik/2.1.0 (Linux; U; Android 11)");
-
-            while (parsedPayload.endsWith("\r\n")) {
-                parsedPayload = parsedPayload.substring(0, parsedPayload.length() - 2);
-            }
-
-            if (parsedPayload.toLowerCase().contains("websocket")) {
-                if (!parsedPayload.toLowerCase().contains("sec-websocket-key")) {
-                    byte[] nonce = new byte[16];
-                    new Random().nextBytes(nonce);
-                    String wsKey = Base64.encodeToString(nonce, Base64.NO_WRAP);
-                    parsedPayload += "\r\nSec-WebSocket-Key: " + wsKey;
-                }
-                if (!parsedPayload.toLowerCase().contains("sec-websocket-version")) {
-                    parsedPayload += "\r\nSec-WebSocket-Version: 13";
-                }
-            }
 
             parsedPayload += "\r\n\r\n";
 
@@ -98,6 +91,7 @@ public class CloudflareWsProxy implements Proxy {
             int c;
             int responseCount = 0;
             boolean isTunnelOpen = false;
+            boolean websocketEstablished = false;
 
             while ((c = in.read()) >= 0) {
                 response.append((char) c);
@@ -105,7 +99,12 @@ public class CloudflareWsProxy implements Proxy {
                     responseCount++;
                     String currentRes = response.toString().trim();
 
-                    if (currentRes.contains("HTTP/1.1 101") || currentRes.contains("HTTP/1.0 200 Connection established") || currentRes.contains("HTTP/1.1 200")) {
+                    if (currentRes.contains("HTTP/1.1 101") || currentRes.contains("HTTP/1.0 101")) {
+                        isTunnelOpen = true;
+                        websocketEstablished = true;
+                        break;
+                    }
+                    if (currentRes.contains("HTTP/1.0 200 Connection established") || currentRes.contains("HTTP/1.1 200")) {
                         isTunnelOpen = true;
                         break;
                     }
@@ -121,16 +120,28 @@ public class CloudflareWsProxy implements Proxy {
                 throw new Exception("Connection closed by peer.");
             }
 
-            // SSH bytes must be transported as masked client WebSocket frames.
-            InputStream tunnelIn = in;
-            OutputStream tunnelOut = out;
-            in = new WsInputStream(tunnelIn, tunnelOut);
-            out = new WsOutputStream(tunnelOut);
-            Pq.p("Tunnel successfully established with WebSocket framing.");
+            if (websocketEstablished) {
+                // Frame SSH bytes only after a real 101 upgrade.
+                InputStream tunnelIn = in;
+                OutputStream tunnelOut = out;
+                in = new WsInputStream(tunnelIn, tunnelOut);
+                out = new WsOutputStream(tunnelOut);
+                Pq.p("Tunnel successfully established with WebSocket framing.");
+            } else {
+                Pq.p("Tunnel established as raw TLS stream.");
+            }
         } catch (Exception e) {
             Pq.p("Proxy Error: Connection failed.");
             throw e;
         }
+    }
+
+    private static String randomToken(int length) {
+        final char[] alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
+        Random random = new Random();
+        StringBuilder value = new StringBuilder(length);
+        for (int i = 0; i < length; i++) value.append(alphabet[random.nextInt(alphabet.length)]);
+        return value.toString();
     }
 
     private static final class WsOutputStream extends OutputStream {
