@@ -43,11 +43,14 @@ function sync_legacy_mysql_servers(PDO $sqlite): void {
         $legacyIds = [];
         foreach ($v2Rows as $r) $legacyIds[] = 'legacy-v2ray-'.(int)$r['id'];
         foreach ($sshRows as $r) $legacyIds[] = 'legacy-ssh-'.(int)$r['id'];
+        // MySQL is the authoritative panel source. Remove every API row that
+        // is not represented by the current panel rows, including old rows
+        // created before the legacy-* migration.
         if ($legacyIds) {
             $marks = implode(',', array_fill(0, count($legacyIds), '?'));
-            $sqlite->prepare("DELETE FROM servers WHERE id LIKE 'legacy-%' AND id NOT IN ($marks)")->execute($legacyIds);
+            $sqlite->prepare("DELETE FROM servers WHERE id NOT IN ($marks)")->execute($legacyIds);
         } else {
-            $sqlite->exec("DELETE FROM servers WHERE id LIKE 'legacy-%'");
+            $sqlite->exec('DELETE FROM servers');
         }
         foreach ($v2Rows as $r) {
             $secret = '';
