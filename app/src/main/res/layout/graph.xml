@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_height="wrap_content"
+	android:layout_width="match_parent"
+	android:orientation="vertical"
+	android:padding="5dp">
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:visibility="gone"
+		android:layout_height="wrap_content">
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+
+			android:gravity="center_vertical">
+
+			<ImageView
+				android:src="@drawable/ic_cloud_upload"
+				android:layout_width="20dp"
+				android:layout_height="20dp"
+				android:layout_marginRight="5dp"
+				app:tint="?colorPrimary" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="00KB"
+				style="@style/MainTextView"
+				android:id="@+id/sent_bytes"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1.0"
+			android:gravity="right|center_vertical">
+
+			<ImageView
+				android:src="@drawable/ic_cloud_download"
+				android:layout_width="20dp"
+				android:layout_height="20dp"
+				android:layout_marginRight="5dp"
+				app:tint="?colorPrimary" />
+
+
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<com.github.mikephil.charting.charts.LineChart
+		android:id="@+id/chart"
+		android:layout_width="match_parent"
+		android:layout_height="fill_parent"
+		android:layout_weight="1.0"/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:gravity="center_vertical"
+		android:visibility="gone">
+
+		<ImageView
+			android:layout_width="20dp"
+			android:layout_height="20dp"
+			android:layout_marginRight="5dp"
+			android:src="@drawable/ic_stats_duration"
+			app:tint="#FFFFFFFF" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="00:00:00"
+			android:textSize="12sp"
+			android:layout_marginRight="10dp"
+			android:id="@+id/stats_duration"
+			android:textColor="#FFFFFFFF"/>
+
+		<ImageView
+			android:layout_width="20dp"
+			android:layout_height="20dp"
+			android:layout_marginRight="5dp"
+			android:src="@drawable/ic_sent_bytes"
+			app:tint="#FFFFFFFF" />
+
+
+
+		<ImageView
+			android:layout_width="20dp"
+			android:layout_height="20dp"
+			android:layout_marginRight="5dp"
+			android:src="@drawable/ic_recv_bytes"
+			app:tint="#FFFFFFFF" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="0KB"
+			android:textSize="12sp"
+			android:layout_marginRight="10dp"
+			android:id="@+id/recv_bytes"
+			android:textColor="#FFFFFFFF"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

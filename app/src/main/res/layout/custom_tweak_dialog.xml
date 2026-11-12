@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:padding="15dp">
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Tweak Mode"/>
+
+	<Spinner
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="10dp"
+		android:id="@+id/custom_tweak_mode"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/tweak_mode_title"/>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical">
+
+		<EditText
+			android:layout_width="wrap_content"
+			android:inputType="textMultiLine"
+			android:layout_height="wrap_content"
+			android:ems="10"
+			android:id="@+id/custom_tweak_edit"
+			android:hint="@string/payload_hint"
+			android:layout_weight="1.0"
+			android:textSize="12sp"/>
+
+		<ImageView
+			android:src="@drawable/ic_generator"
+			android:tint="?colorAccent"
+			android:layout_width="35dp"
+			android:layout_height="35dp"
+			android:id="@+id/custom_tweak_generate"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/custom_tweak_proxy_layout"
+		android:layout_marginBottom="15dp">
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Proxy Settings"
+				android:layout_weight="1.0"/>
+
+			<Switch
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Use default proxy"
+				android:id="@+id/custom_tweak_default_proxy"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+
+			<EditText
+				android:layout_width="wrap_content"
+				android:ems="10"
+				android:layout_height="wrap_content"
+				android:inputType="textUri"
+				android:hint="Proxy"
+				android:id="@+id/custom_tweak_proxy"/>
+
+			<EditText
+				android:layout_width="wrap_content"
+				android:inputType="number"
+				android:layout_height="wrap_content"
+				android:ems="10"
+				android:hint="Port"
+				android:id="@+id/custom_tweak_proxy_port"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<Button
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="?colorAccent"
+		android:text="SAVE"
+		android:id="@+id/custok_tweak_save"
+		android:textColor="#FFFFFFFF"/>
+
+</LinearLayout>
+
