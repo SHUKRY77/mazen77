@@ -1,0 +1,44 @@
+name: Build abusultan vip APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+env:
+  GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx3g
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platform-tools" "platforms;android-32" "build-tools;32.0.0"
+
+      - name: Grant Gradle permission
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: abusultan-vip-debug
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
