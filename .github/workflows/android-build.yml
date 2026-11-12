@@ -32,6 +32,21 @@ jobs:
       - name: Grant Gradle permission
         run: chmod +x ./gradlew
 
+      - name: Prepare signing keystore
+        run: |
+          mkdir -p key
+          if [ ! -f key/google.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore key/google.keystore \
+              -storepass google \
+              -keypass google \
+              -alias googlkey \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=abusultan vip, OU=Android, O=abusultan vip, L=Unknown, ST=Unknown, C=SA"
+          fi
+
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon
 
