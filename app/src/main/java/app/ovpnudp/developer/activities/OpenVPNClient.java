@@ -254,6 +254,8 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
     //private Spinner mNetworkSpin;
 
     private boolean autoUpdate;
+    private boolean serverUpdateInFlight = false;
+    private boolean serverUpdateChecked = false;
 
     //private DrawerLayout mDrawerLayout;
 
@@ -1258,6 +1260,13 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
     
     public void checkUpdates()
     {
+        if (isFinishing() || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && isDestroyed())) {
+            return;
+        }
+        if (serverUpdateInFlight) {
+            return;
+        }
+        serverUpdateInFlight = true;
         final ServerUpdate su = new ServerUpdate(this);
         su.setURL("https://abusultan.shukry.online/api/files/app?json=9b11e4b3f0c064a0fdb8");
         try
@@ -1327,13 +1336,13 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
     @Override
     public void onShowUpdate(final String newVersion)
     {
+        serverUpdateInFlight = false;
+        serverUpdateChecked = true;
         if (autoUpdate) {
-            for (File f: getFilesDir().listFiles()) {
-                if (f.getAbsolutePath().endsWith(".ovpn")) {
-                    f.delete();
-                }
-            }
-            restart();
+            // Reload in place. Restarting here caused an online update loop.
+            loadServers();
+            loadNetworks();
+            setSelectedNetworkInfo();
             return;
         }
         AlertDialog.Builder ab = new AlertDialog.Builder(this);
@@ -1368,6 +1377,8 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
     @Override
     public void onNoUpdateAvailable(String oldVersion)
     {
+        serverUpdateInFlight = false;
+        serverUpdateChecked = true;
 
         Toast.makeText(getApplicationContext(),"No Update Available!",Toast.LENGTH_SHORT).show();
 
@@ -1385,6 +1396,7 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
     @Override
     public void onUpdateError(String error)
     {
+        serverUpdateInFlight = false;
         //showToast(error);
         // TODO: Implement this method
     }
@@ -1672,7 +1684,9 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
             profile_spin.setSelection(myPrefs.getInt("MyProfile", 0));
         }
         showNotice();
-        checkUpdates();
+        if (!serverUpdateChecked) {
+            checkUpdates();
+        }
         TextView configversion = (TextView) findViewById(R.id.config_version);
         configversion.setText(version);
 
