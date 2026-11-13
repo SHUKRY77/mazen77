@@ -6,6 +6,7 @@ import org.json.*;
 import java.io.*;
 import java.net.*;
 import app.ovpnudp.developer.utils.Utils.*;
+import app.ovpnudp.developer.utils.ServerCache;
 
 public class JsonManager
 {
@@ -250,11 +251,17 @@ public class JsonManager
         @Override
         protected String doInBackground(String[] s)
         {
+            HttpURLConnection con = null;
             try {
                 URL murl = new URL(s[0]);
-                HttpURLConnection con = (HttpURLConnection)murl.openConnection();
+                con = (HttpURLConnection)murl.openConnection();
+                con.setConnectTimeout(10000);
+                con.setReadTimeout(15000);
                 con.setRequestMethod("GET");
                 con.connect();
+                if (con.getResponseCode() < 200 || con.getResponseCode() >= 300) {
+                    return "Error: HTTP " + con.getResponseCode();
+                }
 
                 StringBuilder sb = new StringBuilder();
                 char[] buff = new char[1024];
@@ -270,6 +277,8 @@ public class JsonManager
                 return str;
             } catch (Exception e) {
                 return "Error: " + e.getMessage();
+            } finally {
+                if (con != null) con.disconnect();
             }
         }
 
@@ -277,26 +286,24 @@ public class JsonManager
         protected void onPostExecute(String result)
         {
             if (result.startsWith("Error")) {
-            listener.onUpdateError(result);
+                if (listener != null) listener.onUpdateError(result);
             } else {
                 try {
-                    File file = new File(context.getFilesDir(), "Servers.js");
-                    String oldVersion = currentVersion;
+                    String oldVersion = currentVersion == null ? "0" : currentVersion;
                     JSONObject js = new JSONObject(result);
                     String newVersion = js.getString("Version");
+                    if (!js.has("Servers") || !js.has("Networks") || !js.has("SSLNetworks")) {
+                        throw new JSONException("Incomplete server list");
+                    }
                     
                     if (versionCompare(newVersion, oldVersion)) {
-                        OutputStream out = new FileOutputStream(file);
-                        out.write(result.getBytes());
-                        out.flush();
-                        out.close();
-
-                        listener.onShowUpdate(newVersion);
+                        ServerCache.save(context, result);
+                        if (listener != null) listener.onShowUpdate(newVersion);
                     } else {
-                        listener.onNoUpdateAvailable(oldVersion);
+                        if (listener != null) listener.onNoUpdateAvailable(oldVersion);
                     }
                 } catch (Exception e) {
-                    listener.onUpdateError(e.getMessage());
+                    if (listener != null) listener.onUpdateError("Error: " + e.getMessage());
                 }
             }
             // TODO: Implement this method

@@ -1224,6 +1224,10 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
             parser.parseConfig(new InputStreamReader(getResources().openRawResource(R.raw.config)));
             VpnProfile vp = parser.convertProfile();
             JSONArray serversArray = getServersArray();
+            if (serversArray == null) {
+                showToast("لا توجد قائمة سيرفرات صالحة؛ سيتم استخدام القائمة المحفوظة لاحقًا.");
+                return;
+            }
             for (int i = 0; i < serversArray.length(); i++) {
                 JSONObject server = serversArray.getJSONObject(i);
                 String server_name = server.getString("Name");
@@ -1355,8 +1359,7 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
                 @Override
                 public void onClick(DialogInterface p0, int p1)
                 {
-                    File file = new File(getFilesDir(), "Servers.js");
-                    file.delete();
+                    // Keep the last known-good encrypted cache when the user cancels.
                 }
             });
         ab.setCancelable(false);

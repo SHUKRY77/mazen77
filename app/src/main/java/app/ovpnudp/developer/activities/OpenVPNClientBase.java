@@ -37,6 +37,7 @@ import org.json.*;
 import java.io.*;
 import android.widget.*;
 import app.ovpnudp.developer.utils.Utils.*;
+import app.ovpnudp.developer.utils.ServerCache;
 import app.ovpnudp.developer.service.*;
 import net.openvpn.openvpn.*;
 
@@ -94,19 +95,25 @@ public abstract class OpenVPNClientBase extends AppCompatActivity implements Inj
     }
     protected JSONObject getJSONObject()
     {
-        File file = new File(getFilesDir(), "Servers.js");
         try {
+            String cached = ServerCache.load(this);
+            if (cached != null) {
+                return new JSONObject(cached);
+            }
+            File file = new File(getFilesDir(), "Servers.js");
             if (file.exists()) {
                 return new JSONObject(readStream(new FileInputStream(file)));
-            } else {
-                String s = readStream(getResources().openRawResource(R.raw.servers));
-                String s2 = Parser.parseToString(s);
-                return new JSONObject(s2);
             }
+            String s = readStream(getResources().openRawResource(R.raw.servers));
+            return new JSONObject(Parser.parseToString(s));
         } catch (Exception e) {
-
+            try {
+                String s = readStream(getResources().openRawResource(R.raw.servers));
+                return new JSONObject(Parser.parseToString(s));
+            } catch (Exception ignored) {
+                return null;
+            }
         }
-        return null;
     }
 
     protected JSONArray getServersArray()
