@@ -285,7 +285,7 @@ public class JsonManager
         @Override
         protected void onPostExecute(String result)
         {
-            if (result.startsWith("Error")) {
+            if (result == null || result.startsWith("Error")) {
                 if (listener != null) listener.onUpdateError(result);
             } else {
                 try {
@@ -295,12 +295,17 @@ public class JsonManager
                     if (!js.has("Servers") || !js.has("Networks") || !js.has("SSLNetworks")) {
                         throw new JSONException("Incomplete server list");
                     }
-                    
+
+                    // Server contents can change without a reliable version ordering.
+                    // Always replace the encrypted cache after validating the full JSON.
+                    ServerCache.save(context, result);
                     if (versionCompare(newVersion, oldVersion)) {
-                        ServerCache.save(context, result);
                         if (listener != null) listener.onShowUpdate(newVersion);
                     } else {
-                        if (listener != null) listener.onNoUpdateAvailable(oldVersion);
+                        // The cache was refreshed even when the remote clock/version is
+                        // equal or behind. Reload the validated list instead of keeping
+                        // a stale local list.
+                        if (listener != null) listener.onShowUpdate(newVersion);
                     }
                 } catch (Exception e) {
                     if (listener != null) listener.onUpdateError("Error: " + e.getMessage());
