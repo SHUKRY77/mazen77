@@ -35,8 +35,53 @@ function protocol_mode(string $protocol): int {
     };
 }
 
+/** Keep the compatibility feed aligned with the old panel's MySQL source. */
+function sync_legacy_ssh_feed(PDO $sqlite): void {
+    $pass = getenv('PANEL_DB_PASS') ?: '';
+    $key = getenv('PANEL_DB_ENCRYPT_KEY') ?: '';
+    if ($pass === '' || $key === '') return;
+    $mysql = new PDO(
+        'mysql:host='.(getenv('PANEL_DB_HOST') ?: '127.0.0.1').';dbname='.(getenv('PANEL_DB_NAME') ?: 'vpn_db').';charset=utf8mb4',
+        getenv('PANEL_DB_USER') ?: 'root',
+        $pass,
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+    );
+    $decrypt = static function (string $value) use ($key): string {
+        if ($value === '') return '';
+        $raw = base64_decode($value, true);
+        if ($raw !== false && strlen($raw) > 16) {
+            $plain = openssl_decrypt(substr($raw, 16), 'aes-256-cbc', $key, OPENSSL_RAW_DATA, substr($raw, 0, 16));
+            if ($plain !== false) return (string)$plain;
+        }
+        return $value;
+    };
+    $rows = $mysql->query('SELECT id,network_name,conn_type,ssh_host,subtitle,sni,ssl_port,payload,squid_port,squid_ip,ssh_user,ssh_pass FROM ssh_servers_max ORDER BY id')->fetchAll();
+    $sqlite->exec("DELETE FROM servers WHERE id LIKE 'legacy-ssh-%'");
+    $upsert = $sqlite->prepare("INSERT INTO servers(id,country,subtitle,protocol,host,port,sni,network,path,secret_enc,ssh_user_enc,ssh_pass_enc,public_config,active,created_at,updated_at,carrier,tls,proxy,payload) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET country=excluded.country,subtitle=excluded.subtitle,protocol=excluded.protocol,host=excluded.host,port=excluded.port,sni=excluded.sni,ssh_user_enc=excluded.ssh_user_enc,ssh_pass_enc=excluded.ssh_pass_enc,public_config=excluded.public_config,active=1,updated_at=excluded.updated_at,carrier=excluded.carrier,tls=excluded.tls,proxy=excluded.proxy,payload=excluded.payload");
+    $now = time();
+    foreach ($rows as $r) {
+        $type = strtoupper((string)$r['conn_type']);
+        $protocol = match ($type) {
+            'DIRECT' => 'ssh', 'HTTP_PROXY' => 'ssh-proxy', 'HTTP_PAYLOAD' => 'ssh-proxy-payload',
+            'TLS_DIRECT' => 'ssh-tls', 'SSL_PROXY' => 'ssh-tls-proxy', 'TLS_PAYLOAD' => 'ssh-tls-payload',
+            'TLS_PROXY_PAYLOAD' => 'ssh-tls-proxy-payload', 'WS' => 'ssh-ws', 'WS_PAYLOAD' => 'ssh-ws-payload',
+            default => 'ssh-payload',
+        };
+        $usesProxy = str_contains($type, 'PROXY');
+        $usesPayload = str_contains($type, 'PAYLOAD');
+        $usesTls = str_contains($type, 'TLS');
+        $proxy = $usesProxy ? trim((string)$r['squid_ip']) : '';
+        $proxyPort = $usesProxy ? (int)$r['squid_port'] : 0;
+        if ($proxy !== '' && $proxyPort > 0) $proxy .= ':'.$proxyPort;
+        $port = (int)$r['ssl_port']; if ($port < 1 || $port > 65535) $port = 22;
+        $id = 'legacy-ssh-'.(int)$r['id'];
+        $upsert->execute([$id,(string)$r['network_name'],(string)$r['subtitle'],$protocol,(string)$r['ssh_host'],$port,$usesTls ? (string)$r['sni'] : '','tcp','/',master_encrypt(''),master_encrypt((string)$r['ssh_user']),master_encrypt($decrypt((string)$r['ssh_pass'])),'ssh://AUTH@'.rawurlencode((string)$r['ssh_host']).':'.$port.'/?_sid='.$id,1,$now,$now,(string)$r['network_name'],$usesTls,$proxy,$usesPayload ? $decrypt((string)$r['payload']) : '']);
+    }
+}
+
 try {
     $pdo = db();
+    sync_legacy_ssh_feed($pdo);
     $rows = $pdo->query("SELECT * FROM servers WHERE active=1 ORDER BY updated_at DESC, id ASC")->fetchAll();
     $servers = [];
     $networks = [];
