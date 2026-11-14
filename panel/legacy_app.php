@@ -27,10 +27,10 @@ function protocol_mode(string $protocol): int {
     return match ($protocol) {
         'ssh' => 0,
         'ssh-payload', 'ssh-ws', 'ssh-ws-payload' => 1,
-        'ssh-proxy-payload' => 2,
-        'ssh-tls', 'ssh-tls-proxy' => 3,
+        'ssh-proxy', 'ssh-proxy-payload' => 2,
+        'ssh-tls' => 3,
         'ssh-tls-payload' => 4,
-        'ssh-tls-proxy-payload' => 5,
+        'ssh-tls-proxy', 'ssh-tls-proxy-payload' => 5,
         default => 0,
     };
 }
