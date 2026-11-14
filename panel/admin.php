@@ -92,7 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($action === 'save_server') {
         $id = preg_match('/^[a-f0-9]{32}$/', postv('id')) ? postv('id') : random_hex(16);
-        $isSshPost = str_starts_with(postv('protocol'), 'ssh') || postv('protocol') === 'dnstt';
+        $protocol = strtolower(postv('protocol','vless'));
+        $isSshPost = str_starts_with($protocol, 'ssh') || $protocol === 'dnstt';
+        $usesProxy = str_contains($protocol, 'proxy');
+        $usesPayload = str_contains($protocol, 'payload') || str_contains($protocol, 'ws-payload');
+        $usesTls = str_contains($protocol, 'tls');
+        $cleanSni = $usesTls ? postv('sni') : '';
+        $cleanProxy = $usesProxy ? postv('proxy') : '';
+        $cleanPayload = $usesPayload ? postv('payload') : '';
         $secret = postv('secret');
         $existing = null;
         if (preg_match('/^[a-f0-9]{32}$/', $id)) {
@@ -112,9 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($isSshPost && $public === '') $public = 'ssh://AUTH@'.postv('host').':'.(int)postv('port','22').'/?_sid='.$id;
         if ($public === '' || stripos($public, 'AUTH') === false || preg_match('/(uuid|password|passwd)=/i', $public)) exit('الرابط العام يجب أن يحتوي AUTH ولا يحتوي كلمة المرور.');
         $values = [
-            $id, postv('country','Server'), postv('subtitle','Secure server'), postv('protocol','vless'), postv('host'), (int)postv('port','443'), postv('sni'), postv('network','tcp'), postv('path','/'),
+            $id, postv('country','Server'), postv('subtitle','Secure server'), $protocol, postv('host'), (int)postv('port','443'), $cleanSni, postv('network','tcp'), postv('path','/'),
             master_encrypt($secret), $sshUserEnc, $sshPassEnc, $public, checked('active'), time(), time(),
-            postv('target_app','abusultan vip'), postv('carrier'), checked('tls'), postv('tls_version','default'), postv('fingerprint','chrome'), postv('alpn'), postv('proxy'), postv('payload'), postv('service_name'), postv('reality_public_key'), postv('reality_short_id'), postv('reality_dest'), postv('dns_nameserver'), postv('dns_public_key'), max(1, min(65535, (int)postv('udpgw_port','7300'))), checked('udpgw_enabled'), checked('proxy_auth'), postv('dns_resolver','8.8.8.8:53'), postv('dnstt_mode','UDP')
+            postv('target_app','abusultan vip'), postv('carrier'), checked('tls'), postv('tls_version','default'), postv('fingerprint','chrome'), postv('alpn'), $cleanProxy, $cleanPayload, postv('service_name'), postv('reality_public_key'), postv('reality_short_id'), postv('reality_dest'), postv('dns_nameserver'), postv('dns_public_key'), max(1, min(65535, (int)postv('udpgw_port','7300'))), checked('udpgw_enabled'), ($usesProxy ? checked('proxy_auth') : 0), postv('dns_resolver','8.8.8.8:53'), postv('dnstt_mode','UDP')
         ];
         db()->prepare('INSERT INTO servers(id,country,subtitle,protocol,host,port,sni,network,path,secret_enc,ssh_user_enc,ssh_pass_enc,public_config,active,created_at,updated_at,target_app,carrier,tls,tls_version,fingerprint,alpn,proxy,payload,service_name,reality_public_key,reality_short_id,reality_dest,dns_nameserver,dns_public_key,udpgw_port,udpgw_enabled,proxy_auth,dns_resolver,dnstt_mode) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET country=excluded.country,subtitle=excluded.subtitle,protocol=excluded.protocol,host=excluded.host,port=excluded.port,sni=excluded.sni,network=excluded.network,path=excluded.path,secret_enc=excluded.secret_enc,ssh_user_enc=excluded.ssh_user_enc,ssh_pass_enc=excluded.ssh_pass_enc,public_config=excluded.public_config,active=excluded.active,updated_at=excluded.updated_at,target_app=excluded.target_app,carrier=excluded.carrier,tls=excluded.tls,tls_version=excluded.tls_version,fingerprint=excluded.fingerprint,alpn=excluded.alpn,proxy=excluded.proxy,payload=excluded.payload,service_name=excluded.service_name,reality_public_key=excluded.reality_public_key,reality_short_id=excluded.reality_short_id,reality_dest=excluded.reality_dest,dns_nameserver=excluded.dns_nameserver,dns_public_key=excluded.dns_public_key,udpgw_port=excluded.udpgw_port,udpgw_enabled=excluded.udpgw_enabled,proxy_auth=excluded.proxy_auth,dns_resolver=excluded.dns_resolver,dnstt_mode=excluded.dnstt_mode')->execute($values);
         audit('server_save'); header('Location: /admin.php?tab='.($isSshPost ? 'ssh' : 'v2ray')); exit;

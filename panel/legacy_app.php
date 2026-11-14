@@ -50,15 +50,19 @@ try {
         $port = safe_port($row['port'] ?? 22, 22);
         $name = trim((string)($row['country'] ?? 'Server'));
         $subtitle = trim((string)($row['subtitle'] ?? ''));
-        $proxy = trim((string)($row['proxy'] ?? ''));
+        $usesProxy = str_contains($protocol, 'proxy');
+        $usesPayload = str_contains($protocol, 'payload') || str_contains($protocol, 'ws-payload');
+        $usesTls = str_contains($protocol, 'tls');
+        // TLS Direct is SNI-only in the Android engine; never reuse a stale proxy.
+        $proxy = $usesProxy ? trim((string)($row['proxy'] ?? '')) : '';
         $proxyHost = $proxy;
         $proxyPort = '8080';
         if (preg_match('/^([^:]+):(\d+)$/', $proxy, $m)) {
             $proxyHost = $m[1];
             $proxyPort = safe_port($m[2], 8080);
         }
-        $sni = trim((string)($row['sni'] ?? ''));
-        $payload = (string)($row['payload'] ?? '');
+        $sni = $usesTls ? trim((string)($row['sni'] ?? '')) : '';
+        $payload = $usesPayload ? (string)($row['payload'] ?? '') : '';
         $mode = protocol_mode($protocol);
         $serverIndex = count($servers) + 1;
         $servers[] = [
