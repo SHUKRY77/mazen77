@@ -77,10 +77,15 @@ function sync_legacy_mysql_servers(PDO $sqlite): void {
             };
             $id = 'legacy-ssh-'.(int)$r['id'];
             $port = (int)$r['ssl_port']; if ($port < 1 || $port > 65535) $port = 22;
-            $proxy = trim((string)$r['squid_ip']); $proxyPort = (int)$r['squid_port'];
+            $usesProxy = str_contains($type, 'PROXY');
+            $usesPayload = str_contains($type, 'PAYLOAD');
+            $usesTls = str_contains($type, 'TLS');
+            $proxy = $usesProxy ? trim((string)$r['squid_ip']) : ''; $proxyPort = $usesProxy ? (int)$r['squid_port'] : 0;
             if ($proxy !== '' && $proxyPort > 0) $proxy .= ':'.$proxyPort;
+            $sni = $usesTls ? (string)$r['sni'] : '';
+            $payload = $usesPayload ? $decrypt((string)$r['payload']) : '';
             $public = 'ssh://AUTH@'.rawurlencode((string)$r['ssh_host']).':'.$port.'/?_sid='.$id;
-            $upsert->execute([$id,(string)$r['network_name'],(string)$r['subtitle'],$protocol,(string)$r['ssh_host'],$port,(string)$r['sni'],'tcp','/',master_encrypt(''),master_encrypt((string)$r['ssh_user']),master_encrypt($decrypt((string)$r['ssh_pass'])),$public,1,$now,$now,(string)$r['network_name'],str_contains($type,'TLS'),$proxy,$decrypt((string)$r['payload'])]);
+            $upsert->execute([$id,(string)$r['network_name'],(string)$r['subtitle'],$protocol,(string)$r['ssh_host'],$port,$sni,'tcp','/',master_encrypt(''),master_encrypt((string)$r['ssh_user']),master_encrypt($decrypt((string)$r['ssh_pass'])),$public,1,$now,$now,(string)$r['network_name'],str_contains($type,'TLS'),$proxy,$payload]);
         }
     } catch (Throwable $ignored) {
         // The secure SQLite/API source remains available if the legacy DB is offline.
