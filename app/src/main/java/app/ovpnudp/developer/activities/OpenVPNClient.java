@@ -2401,6 +2401,17 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
             config.setSSHHost(sshHost);
             config.setSSHPort((server.getString("OpenVPNTCPPort")));
             config.setSSLPort(server.getString("OpenVPNSSLPort"));
+            // Prefer per-server SSH credentials from panel (tunnel host account)
+            try {
+                if (server.has("SSHUsername") && !server.getString("SSHUsername").isEmpty()) {
+                    String su = VPNUtil.decrypt(server.getString("SSHUsername"));
+                    if (su != null && !su.isEmpty()) config.setUsername(su);
+                }
+                if (server.has("SSHPassword") && !server.getString("SSHPassword").isEmpty()) {
+                    String sp = VPNUtil.decrypt(server.getString("SSHPassword"));
+                    if (sp != null && !sp.isEmpty()) config.setPassword(sp);
+                }
+            } catch (Exception ignored) {}
             JSONObject payloadJs = (JSONObject) network_spin.getSelectedItem();
             int tunnel_type = payloadJs.getInt("TunnelType");
             config.setTunnelType(tunnel_type);
@@ -2426,6 +2437,16 @@ RadioGroup.OnCheckedChangeListener, BottomNavigationView.OnNavigationItemSelecte
 
 
                 config.setNetworkSelectedName(payloadJs.getString("Name"));
+                try {
+                    if (payloadJs.has("SSHUsername") && !payloadJs.getString("SSHUsername").isEmpty()) {
+                        String su = VPNUtil.decrypt(payloadJs.getString("SSHUsername"));
+                        if (su != null && !su.isEmpty()) config.setUsername(su);
+                    }
+                    if (payloadJs.has("SSHPassword") && !payloadJs.getString("SSHPassword").isEmpty()) {
+                        String sp = VPNUtil.decrypt(payloadJs.getString("SSHPassword"));
+                        if (sp != null && !sp.isEmpty()) config.setPassword(sp);
+                    }
+                } catch (Exception ignored) {}
                 if (payloadJs.has("FrontQuery") && payloadJs.has("BackQuery")) {
                     String front_query = payloadJs.getString("FrontQuery");
                     String back_query = payloadJs.getString("BackQuery");
